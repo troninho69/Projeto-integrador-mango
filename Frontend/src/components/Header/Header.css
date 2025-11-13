@@ -1,0 +1,12 @@
+.user-profile-header {
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.user-profile-header:hover {
+  transform: scale(1.02);
+}
+
+.user-profile-header:hover .user-name {
+  color: white !important;
+  transition: color 0.3s ease;
+}
