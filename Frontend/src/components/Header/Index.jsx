@@ -39,14 +39,14 @@ export default function Header() {
             <div className="user-profile-header hidden md:flex items-center space-x-3 cursor-pointer px-4 py-2 rounded-lg transition-all duration-300">
               <Link to="/Profile">
                 <span className="user-name font-medium text-sm md:text-base transition-colors text-[#B15B3C] dark:text-white">
-                  {user?.email || "Usuário"}
+                  {user?.userName}
                 </span>
               </Link>
               <Link to="/Profile">
                 <img
                   src={Profile}
                   alt="Foto de Perfil"
-                  className="w-10 h-10 rounded-full border-2 shadow-md border-[#fff]"
+                  className="w-10 h-10 rounded-full border-2 shadow-md border-white"
                 />
               </Link>
             </div>
@@ -60,7 +60,7 @@ export default function Header() {
               </Link>
               <Link
                 to="/Register"
-                className="px-4 py-2 bg-white text-[#FF8C6B] dark:text-[#ffffff] dark:bg-[#555] font-medium rounded-full border border-[#FF8C6B] dark:border-[#000] hover:bg-[#FF8C6B] dark:hover:bg-[#727272] transition-all duration-300 shadow-md"
+                className="px-4 py-2 bg-white text-[#FF8C6B] dark:text-[#ffffff] dark:bg-[#555] font-medium rounded-full border border-[#FF8C6B] dark:border-black hover:bg-[#FF8C6B] dark:hover:bg-[#727272] transition-all duration-300 shadow-md"
               >
                 Registrar
               </Link>

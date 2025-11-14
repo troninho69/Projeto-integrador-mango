@@ -34,6 +34,10 @@ User.init(
             },
         },
 
+        bio:{
+            type:DataTypes.STRING,
+        },
+
         password: {
             type: DataTypes.STRING,
             allowNull:false

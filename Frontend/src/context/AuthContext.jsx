@@ -13,6 +13,10 @@ export function AuthProvider({ children }) {
   const [isLogged, setIsLogged] = useState(false);
   const [user, setUser] = useState(null);
 
+  function updateUser(updatedData) {
+    setUser((prev) => ({ ...prev, ...updatedData }));
+  }
+
   function login(userData) {
     setUser(userData);
     setIsLogged(true);
@@ -24,7 +28,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ isLogged, user, login, logout }}>
+    <AuthContext.Provider value={{ isLogged, user, login, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

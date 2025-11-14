@@ -67,4 +67,24 @@ router.post("/login", async (req, res) => {
   }
 });
 
+// Rota para atualizar a bio
+router.put("/bio/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { bio } = req.body;
+
+    const user = await User.findByPk(id);
+    if (!user) return res.status(404).json({ error: "Usuário não encontrado" });
+
+    user.bio = bio;
+    await user.save();
+
+    return res.json({ message: "Bio atualizada com sucesso!", bio: user.bio });
+  } catch (error) {
+    console.error("Erro ao atualizar bio:", error);
+    res.status(500).json({ error: "Erro interno no servidor" });
+  }
+});
+
+
 export default router;

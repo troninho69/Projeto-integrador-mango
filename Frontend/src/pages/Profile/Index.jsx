@@ -1,5 +1,6 @@
 import "./Profile.css";
 import { useState, useEffect, useRef } from "react";
+import { useAuth } from "../../context/AuthContext";
 import Header from "../../components/Header/Index";
 import Navbar from "../../components/Navbar/Index";
 
@@ -7,11 +8,38 @@ import TabsComunidades from "../../components/Tabs/TabsComunidades/Index";
 import TabsMusicas from "../../components/Tabs/TabsMusicas/Index";
 
 export default function Profile() {
+  const { user, updateUser } = useAuth();
+  const [isEditingBio, setIsEditingBio] = useState(false);
+  const [tempBio, setTempBio] = useState(user?.bio || "");
+
   const [activeTab, setActiveTab] = useState("musicas");
   const [menuOpen, setMenuOpen] = useState(false); // controla dropdown
   const menuRef = useRef(null); // referência ao dropdown
 
   const switchTab = (tabName) => setActiveTab(tabName);
+
+  const handleBioSave = async () => {
+    setIsEditingBio(false);
+
+    try {
+      const res = await fetch(`http://localhost:3000/auth/bio/${user.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bio: tempBio }),
+      });
+
+      if (!res.ok) throw new Error("Erro ao salvar bio no servidor");
+
+      updateUser({ bio: tempBio }); // atualiza o usuário global
+    } catch (error) {
+      alert("Erro ao salvar bio: " + error.message);
+    }
+  };
+
+  const handleBioClick = () => {
+    setIsEditingBio(true);
+    setTempBio(user?.bio || "");
+  };
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -87,9 +115,10 @@ export default function Profile() {
               >
                 <button
                   className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
-                  onClick={() =>
-                    alert("Funcionalidade de mudar bio ainda não implementada")
-                  }
+                  onClick={() => {
+                    setMenuOpen(false);
+                    setIsEditingBio(true);
+                  }}
                 >
                   Mudar Bio
                 </button>
@@ -104,11 +133,30 @@ export default function Profile() {
           </div>
 
           <div className="profile-info">
-            <h1 className="profile-name">Nome</h1>
-            <p className="profile-username">@Username</p>
+            <h1 className="profile-name">{user?.name}</h1>
+            <p className="profile-username">@{user?.userName}</p>
 
             <p className="profile-description">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+              {isEditingBio ? (
+                <textarea
+                  autoFocus
+                  value={tempBio}
+                  onChange={(e) => setTempBio(e.target.value)}
+                  onBlur={handleBioSave}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleBioSave();
+                    }
+                  }}
+                  className="w-full bg-transparent outline-none resize-none text-center"
+                  rows={3}
+                />
+              ) : (
+                <p onClick={handleBioClick} className="cursor-pointer">
+                  {user?.bio || "Clique para adicionar uma bio"}
+                </p>
+              )}
             </p>
 
             <div className="profile-stats">
@@ -127,14 +175,18 @@ export default function Profile() {
           <div className="tab-navigation">
             <button
               id="tab-musicas"
-              className={`tab-button ${activeTab === "musicas" ? "active" : ""}`}
+              className={`tab-button ${
+                activeTab === "musicas" ? "active" : ""
+              }`}
               onClick={() => switchTab("musicas")}
             >
               Músicas
             </button>
             <button
               id="tab-comunidades"
-              className={`tab-button ${activeTab === "comunidades" ? "active" : ""}`}
+              className={`tab-button ${
+                activeTab === "comunidades" ? "active" : ""
+              }`}
               onClick={() => switchTab("comunidades")}
             >
               Comunidades

@@ -11,13 +11,28 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
 
-  function handleLogin() {
-    // Exemplo simples — aqui você pode chamar seu backend futuramente
-    if (email && senha) {
-      login({ email });
-      navigate("/"); // redireciona para a home
-    } else {
-      alert("Preencha o email e a senha!");
+  async function handleLogin() {
+    try {
+      const res = await fetch("http://localhost:3000/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password: senha }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.error || "Erro ao fazer login.");
+        return;
+      }
+
+      // Login confirmado pelo backend
+      login(data.user);
+      navigate("/");
+    } catch (error) {
+      alert("Erro no login: " + error.message);
     }
   }
 

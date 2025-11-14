@@ -9,7 +9,7 @@ import Login from "./pages/Login/Index";
 import Register from "./pages/Register/Index";
 
 export default function AppRoutes() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [ isLoggedIn ] = useState(false);
   return (
     <Routes>
       <Route path="/" element={<Main isLoggedIn={isLoggedIn}/>} />
