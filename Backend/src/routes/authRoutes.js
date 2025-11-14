@@ -46,10 +46,12 @@ router.post("/login", async (req, res) => {
     const { email, password } = req.body;
 
     const user = await User.findOne({ where: { email } });
-    if (!user) return res.status(404).json({ error: "Usuário não encontrado." });
+    if (!user)
+      return res.status(404).json({ error: "Usuário não encontrado." });
 
     const senhaValida = await user.validarSenha(password);
-    if (!senhaValida) return res.status(401).json({ error: "Senha incorreta." });
+    if (!senhaValida)
+      return res.status(401).json({ error: "Senha incorreta." });
 
     // Se quiser, aqui pode gerar um token JWT
     return res.json({
@@ -59,6 +61,7 @@ router.post("/login", async (req, res) => {
         email: user.email,
         userName: user.userName,
         name: user.name,
+        bio: user.bio, // <--- ADICIONE ISSO!
       },
     });
   } catch (error) {
