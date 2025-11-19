@@ -1,6 +1,5 @@
 import "./Register.css";
 import { Link, useNavigate } from "react-router-dom";
-const Logo = "../../../public/mangoLogo.png";
 import { useState } from "react";
 
 export default function Register() {
@@ -50,7 +49,7 @@ export default function Register() {
 
           <div className="flex justify-center mb-4 flex-col gap-5">
 
-            <img src={Logo} alt="logo" className="flex self-center" />
+            <img src="./mangoLogo.png" alt="logo" className="flex self-center" />
 
             <input
               value={email}

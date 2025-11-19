@@ -1,5 +1,4 @@
 import "./Login.css";
-import Logo from "../../../public/mangoLogo.png";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useState } from "react";
@@ -47,7 +46,7 @@ export default function Login() {
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="bg-[#ffe1ae] dark:bg-inherit border-2 border-black dark:border-white rounded-lg shadow-lg p-6 px-15 max-w-md w-full">
           <div className="flex justify-center mb-4 flex-col gap-5">
-            <img src={Logo} alt="logo" className="flex self-center" />
+            <img src="./mangoLogo.png" alt="logo" className="flex self-center" />
             <input
               value={email}
               onChange={(e) => setEmail(e.target.value)}

@@ -10,11 +10,11 @@ export default function Header() {
     <header className="fixed top-0 left-0 right-0 shadow-lg z-50 bg-[#FFBE73] dark:bg-[#1f1f1f]">
       <div className="container mx-auto px-4 py-3">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-          
+
           {/* Logo */}
           <div className="flex justify-center items-center w-64">
             <img
-              src="../../public/mangoLogo.png"
+              src="./mangoLogo.png"
               alt="Logo Mango"
               className="w-12"
             />

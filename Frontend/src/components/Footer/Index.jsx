@@ -32,7 +32,7 @@ export default function Footer() {
             </div>
             <Link to="#" id="mango-link">
               <img
-                src="../../public/mangoLogo.png"
+                src="./mangoLogo.png"
                 className="w-12 mt-3 cursor-pointer hover:scale-110 transition-transform"
               ></img>
             </Link>
