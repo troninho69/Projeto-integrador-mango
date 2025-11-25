@@ -1,5 +1,5 @@
 import User from "./user.js";
-import Song from "./song.js";
+import Music from "./music.js";
 import Album from "./album.js";
 
 // Auto-relacionamento: usuários seguindo outros usuários
@@ -16,26 +16,26 @@ User.belongsToMany(User, {
 });
 
 // Relacionamento entre: usuários curtindo musicas
-User.belongsToMany(Song, {
+User.belongsToMany(Music, {
   through: "user_song_likes", // tabela intermediária
   as: "likedSongs", // músicas que o usuário curtiu
   foreignKey: "userId",
 });
 
-Song.belongsToMany(User, {
+Music.belongsToMany(User, {
   through: "user_song_likes",
   as: "likedBy", // usuários que curtiram essa música
   foreignKey: "songId",
 });
 
 // Um Álbum tem várias músicas
-Album.hasMany(Song, {
+Album.hasMany(Music, {
   foreignKey: "albumId",
   as: "songs",
 });
 
 // Uma música pertence a um álbum
-Song.belongsTo(Album, {
+Music.belongsTo(Album, {
   foreignKey: "albumId",
   as: "album",
 });

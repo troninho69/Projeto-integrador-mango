@@ -2,7 +2,7 @@ import app from "./src/app.js";
 import sequelize from "./src/config/database.js";
 
 import "./src/models/user.js";
-import "./src/models/song.js";
+import "./src/models/music.js";
 import "./src/models/album.js";
 import "./src/models/associations.js";
 

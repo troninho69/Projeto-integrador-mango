@@ -61,7 +61,8 @@ router.post("/login", async (req, res) => {
         email: user.email,
         userName: user.userName,
         name: user.name,
-        bio: user.bio, // <--- ADICIONE ISSO!
+        bio: user.bio, 
+        artist: user.artist,
       },
     });
   } catch (error) {
@@ -88,6 +89,25 @@ router.put("/bio/:id", async (req, res) => {
     res.status(500).json({ error: "Erro interno no servidor" });
   }
 });
+
+// Dar role de artista para um usuário
+router.put("/make-artist/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const user = await User.findByPk(id);
+    if (!user) return res.status(404).json({ error: "Usuário não encontrado" });
+
+    user.artist = true;
+    await user.save();
+
+    return res.json({ message: "Usuário agora é artista!", artist: true });
+  } catch (error) {
+    console.error("Erro ao atualizar role:", error);
+    res.status(500).json({ error: "Erro interno no servidor" });
+  }
+});
+
 
 
 export default router;

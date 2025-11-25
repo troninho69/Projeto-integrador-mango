@@ -1,9 +1,9 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../config/database.js";
 
-class Song extends Model {}
+class Music extends Model {}
 
-Song.init(
+Music.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -16,12 +16,14 @@ Song.init(
       allowNull: false,
     },
 
-    url: {
+    cover: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+
+    path: {
       type: DataTypes.STRING,
       allowNull: false,
-      validate: {
-        isUrl: true,
-      },
     },
 
     artist: {
@@ -37,17 +39,9 @@ Song.init(
         key: "id",
       },
     },
-    
+
     duration: {
       type: DataTypes.TIME, // pode armazenar formato hh:mm:ss
-      allowNull: false,
-    },
-    releaseDate: {
-      type: DataTypes.DATEONLY, // apenas data (AAAA-MM-DD)
-      allowNull: false,
-    },
-    genre: {
-      type: DataTypes.STRING,
       allowNull: false,
     },
 
@@ -64,10 +58,10 @@ Song.init(
   },
   {
     sequelize,
-    modelName: "Song",
-    tableName: "songs",
+    modelName: "Music",
+    tableName: "musics",
     timestamps: true,
   }
 );
 
-export default Song;
+export default Music;
