@@ -1,28 +1,28 @@
-import app from "./src/app.js";
-import sequelize from "./src/config/database.js";
+import express from 'express';
+import sequelize from './src/db/db.js';
 
-import "./src/models/user.js";
-import "./src/models/music.js";
-import "./src/models/album.js";
-import "./src/models/associations.js";
+const app = express();
+const port = 3000;
 
-const PORT = 3000
+// Middleware para ler JSON
+app.use(express.json());
 
-async function startServer() {
-    try {
-        await sequelize.sync();
+// Teste de rota inicial
+app.get('/', (req, res) => {
+  res.send('Servidor on');
+});
 
-        console.log('Conectado com sucesso ao banco de dados!');
+// Conexão com o banco
+sequelize.authenticate()
+  .then(() => console.log('Conectado ao banco de dados!'))
+  .catch(err => console.error('Erro de conexão:', err));
 
-        app.listen(PORT, () => {
-            console.log(`Server está rodando em http:localhost:${PORT}`);
-        });
-    } catch (error) {
-        console.error('Não Conseguimos conectar ao banco de dados, veja o erro a seguir:')
-        console.error('Detalhes do erro:', error.message);
-        console.error(error);
-    }
-}
+// Sincroniza tabelas (opcional, útil no desenvolvimento)
+sequelize.sync({ alter: true })
+  .then(() => console.log('Tabelas sincronizadas!'))
+  .catch(err => console.error('Erro ao sincronizar tabelas:', err));
 
-startServer();
-
+// Inicia o servidor
+app.listen(port, () => {
+  console.log(`Server listening on port ${port}`);
+});
