@@ -11,12 +11,25 @@ import Music from "../../components/Music/Index.jsx";
 import Discoteca from "../../components/Discoteca/Index.jsx";
 import Clipes from "../../components/Clipes/Index.jsx";
 
+import Player from "../../components/Player/Index.jsx";
+
 export default function Secao() {
   const [songs, setSongs] = useState([]);
+  const [currentSong, setCurrentSong] = useState(null);
 
   useEffect(() => {
     getSongs().then((data) => setSongs(data));
   }, []);
+  const handlePlay = (song) => {
+    setCurrentSong({
+      title: song.title,
+      artist: song.artist,
+      cover: song.cover
+        ? `http://localhost:3000/${song.cover}`
+        : "/default-music.jpg",
+      file: `http://localhost:3000/musics/${song.path}`,
+    });
+  };
 
   return (
     <>
@@ -43,6 +56,7 @@ export default function Secao() {
                     ? `http://localhost:3000/${song.cover}`
                     : "/default-music.jpg"
                 }
+                onClick={() => handlePlay(song)}
               />
             ))}
           </div>
@@ -70,6 +84,7 @@ export default function Secao() {
                       ? `http://localhost:3000/${song.cover}`
                       : "/default-music.jpg"
                   }
+                  onClick={() => handlePlay(song)}
                 />
               ))}
             </div>
@@ -93,6 +108,7 @@ export default function Secao() {
                   titulo={song.title}
                   tempo={song.duration?.slice(0, 5)}
                   autor={song.artist}
+                  onClick={() => handlePlay(song)}
                 />
               ))}
             </div>
@@ -117,6 +133,7 @@ export default function Secao() {
                       ? `http://localhost:3000/${song.cover}`
                       : "/default-music.jpg"
                   }
+                  onClick={() => handlePlay(song)}
                 />
               ))}
             </div>
@@ -142,12 +159,13 @@ export default function Secao() {
                     ? `http://localhost:3000/${song.cover}`
                     : "/default-music.jpg"
                 }
+                onClick={() => handlePlay(song)}
               />
             ))}
           </div>
         </div>
       </div>
-
+      {currentSong && <Player song={currentSong} />}
       <Footer />
     </>
   );
