@@ -13,6 +13,30 @@ import Clipes from "../../components/Clipes/Index.jsx";
 
 import Player from "../../components/Player/Index.jsx";
 
+function getCoverUrl(cover) {
+  if (!cover) return "/default-music.jpg";
+
+  // SEED → já vem com "covers/arquivo.jpg"
+  if (cover.startsWith("covers/")) {
+    return `http://localhost:3000/${cover}`;
+  }
+
+  // UPLOAD → vem apenas "arquivo.jpg"
+  return `http://localhost:3000/covers/${cover}`;
+}
+
+function getMusicUrl(path) {
+  if (!path) return null;
+
+  // SEED → já vem com "musics/arquivo.mp3"
+  if (path.startsWith("musics/")) {
+    return `http://localhost:3000/${path}`;
+  }
+
+  // UPLOAD → vem apenas "arquivo.mp3"
+  return `http://localhost:3000/musics/${path}`;
+}
+
 export default function Secao() {
   const [songs, setSongs] = useState([]);
   const [currentSong, setCurrentSong] = useState(null);
@@ -21,13 +45,12 @@ export default function Secao() {
     getSongs().then((data) => setSongs(data));
   }, []);
   const handlePlay = (song) => {
+    console.log(getMusicUrl(song.path))
     setCurrentSong({
       title: song.title,
       artist: song.artist,
-      cover: song.cover
-        ? `http://localhost:3000/${song.cover}`
-        : "/default-music.jpg",
-      file: `http://localhost:3000/musics/${song.path}`,
+      cover: getCoverUrl(song.cover),
+      file: getMusicUrl(song.path),
     });
   };
 
@@ -51,11 +74,7 @@ export default function Secao() {
                 titulo={song.title}
                 tempo={song.duration?.slice(0, 5) || "00:00"}
                 autor={song.artist}
-                img={
-                  song.cover
-                    ? `http://localhost:3000/${song.cover}`
-                    : "/default-music.jpg"
-                }
+                img={getCoverUrl(song.cover)}
                 onClick={() => handlePlay(song)}
               />
             ))}
@@ -79,11 +98,7 @@ export default function Secao() {
                   titulo={song.title}
                   tempo={song.duration?.slice(0, 5)}
                   autor={song.artist}
-                  img={
-                    song.cover
-                      ? `http://localhost:3000/${song.cover}`
-                      : "/default-music.jpg"
-                  }
+                  img={getCoverUrl(song.cover)}
                   onClick={() => handlePlay(song)}
                 />
               ))}
@@ -100,11 +115,7 @@ export default function Secao() {
               {songs.map((song) => (
                 <Discoteca
                   key={song.id + "-disc"}
-                  img={
-                    song.cover
-                      ? `http://localhost:3000/${song.cover}`
-                      : "/default-music.jpg"
-                  }
+                  img={getCoverUrl(song.cover)}
                   titulo={song.title}
                   tempo={song.duration?.slice(0, 5)}
                   autor={song.artist}
@@ -128,11 +139,7 @@ export default function Secao() {
                   titulo={song.title}
                   tempo={song.duration?.slice(0, 5)}
                   autor={song.artist}
-                  img={
-                    song.cover
-                      ? `http://localhost:3000/${song.cover}`
-                      : "/default-music.jpg"
-                  }
+                  img={getCoverUrl(song.cover)}
                   onClick={() => handlePlay(song)}
                 />
               ))}
@@ -154,11 +161,7 @@ export default function Secao() {
                 titulo={song.title}
                 tempo={song.duration?.slice(0, 5)}
                 autor={song.artist}
-                img={
-                  song.cover
-                    ? `http://localhost:3000/${song.cover}`
-                    : "/default-music.jpg"
-                }
+                img={getCoverUrl(song.cover)}
                 onClick={() => handlePlay(song)}
               />
             ))}
