@@ -6,7 +6,9 @@ export const uploadMusic = async (req, res) => {
     const { title, artist, duration } = req.body;
 
     if (!req.files || !req.files.file) {
-      return res.status(400).json({ error: "Arquivo da música é obrigatório!" });
+      return res
+        .status(400)
+        .json({ error: "Arquivo da música é obrigatório!" });
     }
 
     const fileName = req.files.file[0].filename;
@@ -17,7 +19,7 @@ export const uploadMusic = async (req, res) => {
       artist,
       duration,
       path: fileName,
-      cover: coverName
+      cover: coverName,
     });
 
     res.status(201).json(music);
@@ -33,12 +35,10 @@ export const deleteMusic = async (req, res) => {
     if (!music) return res.status(404).json({ error: "Música não encontrada" });
 
     fs.unlinkSync("uploads/musics/" + music.path);
-    if (music.cover)
-      fs.unlinkSync("uploads/covers/" + music.cover);
+    if (music.cover) fs.unlinkSync("uploads/covers/" + music.cover);
 
     await music.destroy();
     res.json({ message: "Música deletada" });
-
   } catch (err) {
     console.log(err);
     res.status(500).json({ error: "Erro ao deletar música" });
@@ -51,10 +51,10 @@ export const getAllMusics = async (req, res) => {
 
     const musics = await Music.findAll();
 
-    const formatted = musics.map(m => ({
+    const formatted = musics.map((m) => ({
       ...m.dataValues,
       coverUrl: m.cover ? `${baseUrl}/covers/${m.cover}` : null,
-      fileUrl: `${baseUrl}/musics/${m.path}`
+      fileUrl: `${baseUrl}/musics/${m.path}`,
     }));
 
     res.json(formatted);
@@ -62,4 +62,3 @@ export const getAllMusics = async (req, res) => {
     res.status(500).json({ error: "Erro ao listar músicas" });
   }
 };
-

@@ -15,7 +15,7 @@ export default function Secao() {
   const [songs, setSongs] = useState([]);
 
   useEffect(() => {
-    getSongs().then(data => setSongs(data));
+    getSongs().then((data) => setSongs(data));
   }, []);
 
   return (
@@ -25,7 +25,6 @@ export default function Secao() {
 
       <div className="ml-32 md:ml-64 mt-[76px] p-8">
         <div className="max-w-6xl mx-auto">
-
           {/* ESCUTE NOVAMENTE */}
           <div className="text-[#B15B3C] dark:text-white">
             <h2 className="text-3xl font-bold mb-1">Escute novamente</h2>
@@ -33,13 +32,17 @@ export default function Secao() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {songs.map(song => (
+            {songs.map((song) => (
               <Music
                 key={song.id}
                 titulo={song.title}
                 tempo={song.duration?.slice(0, 5) || "00:00"}
                 autor={song.artist}
-                img={song.coverUrl || "/default-music.jpg"}
+                img={
+                  song.cover
+                    ? `http://localhost:3000/${song.cover}`
+                    : "/default-music.jpg"
+                }
               />
             ))}
           </div>
@@ -56,13 +59,17 @@ export default function Secao() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-              {songs.map(song => (
+              {songs.map((song) => (
                 <Music
                   key={song.id + "-discover"}
                   titulo={song.title}
                   tempo={song.duration?.slice(0, 5)}
                   autor={song.artist}
-                  img={song.coverUrl || "/default-music.jpg"}
+                  img={
+                    song.cover
+                      ? `http://localhost:3000/${song.cover}`
+                      : "/default-music.jpg"
+                  }
                 />
               ))}
             </div>
@@ -75,10 +82,14 @@ export default function Secao() {
 
           <div className="max-w-6xl mx-auto">
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 mb-8">
-              {songs.map(song => (
+              {songs.map((song) => (
                 <Discoteca
                   key={song.id + "-disc"}
-                  img={song.coverUrl || "/default-music.jpg"}
+                  img={
+                    song.cover
+                      ? `http://localhost:3000/${song.cover}`
+                      : "/default-music.jpg"
+                  }
                   titulo={song.title}
                   tempo={song.duration?.slice(0, 5)}
                   autor={song.artist}
@@ -95,13 +106,17 @@ export default function Secao() {
 
           <div className="max-w-6xl mx-auto">
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 mb-8">
-              {songs.slice(0, 4).map(song => (
+              {songs.slice(0, 4).map((song) => (
                 <Discoteca
                   key={song.id + "-old"}
                   titulo={song.title}
                   tempo={song.duration?.slice(0, 5)}
                   autor={song.artist}
-                  img={song.coverUrl || "/default-music.jpg"}
+                  img={
+                    song.cover
+                      ? `http://localhost:3000/${song.cover}`
+                      : "/default-music.jpg"
+                  }
                 />
               ))}
             </div>
@@ -116,17 +131,20 @@ export default function Secao() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            {songs.map(song => (
+            {songs.map((song) => (
               <Clipes
                 key={song.id + "-clip"}
                 titulo={song.title}
                 tempo={song.duration?.slice(0, 5)}
                 autor={song.artist}
-                img={song.coverUrl || "/default-music.jpg"}
+                img={
+                  song.cover
+                    ? `http://localhost:3000/${song.cover}`
+                    : "/default-music.jpg"
+                }
               />
             ))}
           </div>
-
         </div>
       </div>
 

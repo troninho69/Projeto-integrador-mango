@@ -6,9 +6,10 @@
     "install:backend": "cd Backend && npm install",
     "install:frontend": "cd Frontend && npm install",
     "install:all": "npm run install:backend && npm run install:frontend",
+    "seed": "cd Backend && npm run seed",
     "start:backend": "cd Backend && npm run dev",
     "start:frontend": "cd Frontend && npm run dev",
-    "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\""
+    "start": "npm run seed && concurrently \"npm run start:backend\" \"npm run start:frontend\""
   },
   "keywords": [],
   "author": "",

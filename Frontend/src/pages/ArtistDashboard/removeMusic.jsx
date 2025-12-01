@@ -15,7 +15,7 @@ export default function RemoveMusic() {
   }, []);
 
   const deleteMusic = async (id) => {
-    await axios.delete(`http://localhost:3000/songs/${id}`);
+    await axios.delete(`http://localhost:3000/songs/delete/${id}`);
     load();
   };
 

@@ -10,10 +10,11 @@ app.use(express.json());
 
 // SERVIR ARQUIVOS ESTÁTICOS
 app.use("/musics", express.static("uploads/musics"));
+app.use("/covers", express.static("uploads/covers"));
 
 app.use("/auth", authRoutes);
 app.use("/songs", songRoutes);
-app.use("/covers", express.static("uploads/covers"));
+
 
 
 export default app;

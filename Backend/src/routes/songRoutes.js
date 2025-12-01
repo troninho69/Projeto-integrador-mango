@@ -3,6 +3,8 @@ import express from "express";
 import { upload } from "../config/multer.js";
 import Music from "../models/music.js";
 import { getAllMusics } from "../controllers/controllerSong.js";
+import fs from "fs";
+import path from "path";
 
 const router = express.Router();
 router.get("/", getAllMusics);
@@ -35,17 +37,30 @@ router.post(
 router.delete("/delete/:id", async (req, res) => {
   try {
     const music = await Music.findByPk(req.params.id);
-    if (!music) return res.status(404).json({ error: "Música não encontrada" });
 
-    fs.unlinkSync("uploads/musics/" + music.path);
-    if (music.cover) fs.unlinkSync("uploads/covers/" + music.cover);
+    if (!music) {
+      return res.status(404).json({ error: "Música não encontrada" });
+    }
+
+    const musicPath = path.join("uploads/musics", music.path);
+    const coverPath = music.cover
+      ? path.join("uploads/covers", music.cover)
+      : null;
+
+    if (fs.existsSync(musicPath)) {
+      fs.unlinkSync(musicPath);
+    }
+
+    if (coverPath && fs.existsSync(coverPath)) {
+      fs.unlinkSync(coverPath);
+    }
 
     await music.destroy();
 
-    res.json({ message: "Música removida com sucesso" });
+    return res.json({ message: "Música removida com sucesso" });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: "Erro ao remover música" });
+    console.error("Erro ao remover:", error);
+    return res.status(500).json({ error: "Erro ao remover música" });
   }
 });
 

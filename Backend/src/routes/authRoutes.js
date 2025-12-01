@@ -1,5 +1,6 @@
 import express from "express";
 import User from "../models/user.js";
+import jwt from "jsonwebtoken";
 
 const router = express.Router();
 
@@ -53,15 +54,21 @@ router.post("/login", async (req, res) => {
     if (!senhaValida)
       return res.status(401).json({ error: "Senha incorreta." });
 
-    // Se quiser, aqui pode gerar um token JWT
+    const token = jwt.sign(
+      { id: user.id },
+      "SEU_SEGREDO_AQUI",
+      { expiresIn: "7d" } // token dura 7 dias
+    );
+
     return res.json({
       message: "Login bem-sucedido!",
+      token,
       user: {
         id: user.id,
         email: user.email,
         userName: user.userName,
         name: user.name,
-        bio: user.bio, 
+        bio: user.bio,
         artist: user.artist,
       },
     });
@@ -107,7 +114,5 @@ router.put("/make-artist/:id", async (req, res) => {
     res.status(500).json({ error: "Erro interno no servidor" });
   }
 });
-
-
 
 export default router;

@@ -6,6 +6,8 @@ export default function EditMusic() {
   const [selected, setSelected] = useState(null);
   const [title, setTitle] = useState("");
   const [duration, setDuration] = useState("");
+  const [artist, setArtist] = useState("");
+  const [cover, setCover] = useState("")
 
   useEffect(() => {
     axios
@@ -14,14 +16,20 @@ export default function EditMusic() {
   }, []);
 
   const updateMusic = async () => {
-    await axios.put(`http://localhost:3000/songs/${selected.id}`, {
-      title,
-      duration,
-    });
+  const formData = new FormData();
+  formData.append("title", title);
+  formData.append("artist", selected.artist);
+  formData.append("duration", duration);
+  formData.append("cover", cover);
 
-    alert("Música atualizada!");
-  };
+  await axios.put(
+    `http://localhost:3000/songs/edit/${selected.id}`,
+    formData,
+    { headers: { "Content-Type": "multipart/form-data" } }
+  );
 
+  alert("Música atualizada!");
+};
   return (
     <div>
       <h2 className="text-xl font-bold mb-4">Editar Música</h2>
@@ -56,6 +64,19 @@ export default function EditMusic() {
             className="border p-2 mt-2 block"
             value={duration}
             onChange={(e) => setDuration(e.target.value)}
+          />
+
+          <input
+            type="text"
+            className="border p-2 mt-2 block"
+            value={artist}
+            onChange={(e) => setArtist(e.target.value)}
+          />
+
+          <input
+            type="file"
+            className="border p-2 mt-2 block"
+            onChange={(e) => setCover(e.target.files[0])}
           />
 
           <button
