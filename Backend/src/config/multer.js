@@ -8,8 +8,13 @@ const storage = multer.diskStorage({
       cb(null, "uploads/musics/");
     } else if (file.fieldname === "cover") {
       cb(null, "uploads/covers/");
+    } else if (file.fieldname === "postImage") {
+      cb(null, "uploads/posts/");
+    } else {
+      cb(null, "uploads/others/"); // fallback opcional
     }
   },
+
   filename: (req, file, cb) => {
     cb(null, Date.now() + path.extname(file.originalname));
   }

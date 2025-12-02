@@ -3,23 +3,23 @@ import { createContext, useContext, useState, useEffect } from "react";
 
 const AuthContext = createContext();
 
-// Hook para usar o contexto em qualquer componente
 export function useAuth() {
   return useContext(AuthContext);
 }
 
-// Provedor do contexto (envolve toda a aplicação)
 export function AuthProvider({ children }) {
   const [isLogged, setIsLogged] = useState(false);
   const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
 
-  // Carrega o usuário salvo no localStorage ao iniciar a aplicação
+  // Carrega dados salvos no localStorage ao iniciar
   useEffect(() => {
     const savedUser = localStorage.getItem("user");
-    const savedLogged = localStorage.getItem("isLogged");
+    const savedToken = localStorage.getItem("token");
 
-    if (savedUser && savedLogged === "true") {
+    if (savedUser && savedToken) {
       setUser(JSON.parse(savedUser));
+      setToken(savedToken);
       setIsLogged(true);
     }
   }, []);
@@ -32,22 +32,26 @@ export function AuthProvider({ children }) {
     });
   }
 
-  function login(userData) {
+  function login(userData, tokenReceived) {
     setUser(userData);
+    setToken(tokenReceived);
     setIsLogged(true);
+
     localStorage.setItem("user", JSON.stringify(userData));
-    localStorage.setItem("isLogged", "true");
+    localStorage.setItem("token", tokenReceived);
   }
 
   function logout() {
     setUser(null);
+    setToken(null);
     setIsLogged(false);
+
     localStorage.removeItem("user");
-    localStorage.removeItem("isLogged");
+    localStorage.removeItem("token");
   }
 
   return (
-    <AuthContext.Provider value={{ isLogged, user, login, logout, updateUser }}>
+    <AuthContext.Provider value={{ isLogged, user, token, login, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

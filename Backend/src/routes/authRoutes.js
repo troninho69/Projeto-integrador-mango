@@ -1,6 +1,7 @@
 import express from "express";
 import User from "../models/user.js";
 import jwt from "jsonwebtoken";
+import uploadProfile from "../config/multerProfille.js";
 
 const router = express.Router();
 
@@ -56,7 +57,7 @@ router.post("/login", async (req, res) => {
 
     const token = jwt.sign(
       { id: user.id },
-      "SEU_SEGREDO_AQUI",
+      process.env.JWT_SECRET,
       { expiresIn: "7d" } // token dura 7 dias
     );
 
@@ -70,11 +71,27 @@ router.post("/login", async (req, res) => {
         name: user.name,
         bio: user.bio,
         artist: user.artist,
+        photo: user.photo,
       },
     });
   } catch (error) {
     console.error("Erro no login:", error);
     res.status(500).json({ error: "Erro interno no servidor." });
+  }
+});
+
+router.put("/photo/:id", uploadProfile.single("photo"), async (req, res) => {
+  try {
+    const user = await User.findByPk(req.params.id);
+
+    if (!user) return res.status(404).json({ error: "Usuário não encontrado" });
+
+    user.photo = `/uploads/profile/${req.file.filename}`;
+    await user.save();
+
+    return res.json({ photo: user.photo });
+  } catch (error) {
+    return res.status(500).json({ error: "Erro ao salvar foto" });
   }
 });
 

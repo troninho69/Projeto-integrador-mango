@@ -44,10 +44,10 @@ export default function Header() {
               </Link>
               <Link to="/Profile">
                 <img
-                  src={Profile}
-                  alt="Foto de Perfil"
-                  className="w-10 h-10 rounded-full border-2 shadow-md border-white"
-                />
+              src={`http://localhost:3000${user?.photo}`}
+              alt="Foto de Perfil"
+              className="cursor-pointer w-10 h-10 rounded-full border-2 shadow-md border-white"
+            />
               </Link>
             </div>
           ) : (

@@ -27,15 +27,17 @@ export default function Login() {
         return;
       }
 
-      // Login confirmado pelo backend
-      login(data.user);
+      // 🔥 SALVAR TOKEN CORRETAMENTE
+      localStorage.setItem("token", data.token);
+
+      // Salvar usuário no contexto
+      login(data.user, data.token);
+
       navigate("/");
     } catch (error) {
       alert("Erro no login: " + error.message);
     }
-  };
-
-  
+  }
 
   return (
     <>
@@ -48,7 +50,11 @@ export default function Login() {
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="bg-[#ffe1ae] dark:bg-inherit border-2 border-black dark:border-white rounded-lg shadow-lg p-6 px-15 max-w-md w-full">
           <div className="flex justify-center mb-4 flex-col gap-5">
-            <img src="./mangoLogo.png" alt="logo" className="flex self-center" />
+            <img
+              src="./mangoLogo.png"
+              alt="logo"
+              className="flex self-center"
+            />
             <input
               value={email}
               onChange={(e) => setEmail(e.target.value)}

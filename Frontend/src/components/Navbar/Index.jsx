@@ -36,7 +36,7 @@ export default function Navbar() {
             {/* COMUNIDADES */}
             <li>
               <Link
-                to="#"
+                to="/Comunidade"
                 className="navbar-item flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-300 hover:translate-x-1 text-[#B15B3C] dark:text-white"
               >
                 <ion-icon name="people-sharp"></ion-icon>

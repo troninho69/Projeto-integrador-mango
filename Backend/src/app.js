@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import authRoutes from "./routes/authRoutes.js";
 import songRoutes from "./routes/songRoutes.js";
+import postRoutes from "./routes/postRoutes.js";
 
 const app = express();
 
@@ -11,9 +12,12 @@ app.use(express.json());
 // SERVIR ARQUIVOS ESTÁTICOS
 app.use("/musics", express.static("uploads/musics"));
 app.use("/covers", express.static("uploads/covers"));
+app.use("/uploads/profile", express.static("uploads/profile"));
+app.use("/uploads/posts", express.static("uploads/posts"));
 
 app.use("/auth", authRoutes);
 app.use("/songs", songRoutes);
+app.use("/posts", postRoutes);
 
 
 

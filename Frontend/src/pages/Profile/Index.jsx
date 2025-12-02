@@ -82,6 +82,30 @@ export default function Profile() {
     };
   }, []);
 
+  const handlePhotoChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("photo", file);
+
+    try {
+      const res = await fetch(`http://localhost:3000/auth/photo/${user.id}`, {
+        method: "PUT",
+        body: formData,
+      });
+
+      if (!res.ok) throw new Error("Erro ao enviar foto");
+
+      const data = await res.json();
+
+      // Atualiza o usuário globalmente (AuthContext)
+      updateUser({ photo: data.photo });
+    } catch (error) {
+      alert("Erro ao atualizar foto: " + error.message);
+    }
+  };
+
   return (
     <>
       <Header />
@@ -92,7 +116,20 @@ export default function Profile() {
           <div className="profile-banner"></div>
 
           <div className="profile-photo">
-            <img src="img/icone_usuario.jpg" alt="Foto de Perfil" />
+            <img
+              src={`http://localhost:3000${user?.photo}`}
+              alt="Foto de Perfil"
+              className="cursor-pointer"
+              onClick={() => document.getElementById("photoInput").click()}
+            />
+
+            <input
+              id="photoInput"
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handlePhotoChange}
+            />
           </div>
 
           <div className="profile-buttons relative">

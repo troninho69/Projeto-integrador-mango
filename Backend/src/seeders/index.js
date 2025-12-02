@@ -4,6 +4,7 @@ import sequelize from "../config/database.js";
 // Importar as funções dos seeders
 import { seedMusics } from "./20251201001853-musicas.js";
 import { seedUsers } from "./20251201135011-users.js";
+import { seedPosts } from "./20251202125332-posts.js";
 
 async function run() {
   try {
@@ -21,6 +22,7 @@ async function run() {
     // Rodar seeders na ordem correta
     await seedUsers();
     await seedMusics();
+    await seedPosts();
 
     console.log("✔ TODOS os seeders foram executados!");
     process.exit(0);

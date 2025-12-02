@@ -1,6 +1,7 @@
 import User from "./user.js";
 import Music from "./music.js";
 import Album from "./album.js";
+import Post from "./post.js";
 
 // Auto-relacionamento: usuários seguindo outros usuários
 User.belongsToMany(User, {
@@ -39,3 +40,6 @@ Music.belongsTo(Album, {
   foreignKey: "albumId",
   as: "album",
 });
+
+User.hasMany(Post, { foreignKey: "userId", onDelete: "CASCADE" });
+Post.belongsTo(User, { foreignKey: "userId" });

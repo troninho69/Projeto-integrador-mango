@@ -60,6 +60,11 @@ User.init(
       type: DataTypes.STRING,
       defaultValue: "commonUser",
     },
+
+    photo: {
+      type: DataTypes.STRING,
+      defaultValue: "/uploads/profile/default.jpg",
+    },
   },
   {
     sequelize,

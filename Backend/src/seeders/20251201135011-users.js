@@ -14,6 +14,7 @@ export async function seedUsers() {
       artist: true,
       role: "admin",
       dateBirth: "2000-01-01",
+      photo: "/uploads/profile/server.jpg"
     },
     {
       name: "Camila alves",
@@ -23,6 +24,7 @@ export async function seedUsers() {
       artist: false,
       role: "commonUser",
       dateBirth: "2000-01-01",
+      photo: "/uploads/profile/camila.jpg"
     },
     {
       name: "Luiz henrique",
@@ -32,6 +34,7 @@ export async function seedUsers() {
       artist: false,
       role: "commonUser",
       dateBirth: "2000-01-01",
+      photo: "/uploads/profile/luiz.jpg"
     },
   ]);
 
