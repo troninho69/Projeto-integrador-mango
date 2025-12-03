@@ -12,6 +12,7 @@ import TabsMusicas from "../../components/Tabs/TabsMusicas/Index";
 export default function Profile() {
   const { id } = useParams();
   const { user, updateUser } = useAuth();
+  const { logout } = useAuth();
 
   const [profileUser, setProfileUser] = useState(null);
   const [isEditingBio, setIsEditingBio] = useState(false);
@@ -122,7 +123,7 @@ export default function Profile() {
   // LOGOUT
   // ===============================
   const handleLogout = () => {
-    alert("Logout realizado!");
+    logout();
     window.location.href = "/login";
   };
 
