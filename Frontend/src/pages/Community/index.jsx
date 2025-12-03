@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "../../components/Header/Index.jsx";
 import Navbar from "../../components/Navbar/Index.jsx";
 import Footer from "../../components/Footer/Index.jsx";
@@ -12,37 +13,54 @@ const TEXT_PRIMARY = "text-[#ffffff]";
 const TEXT_SECONDARY = "text-[#6e6e6e]";
 const BORDER_COLOR = "border-[#2d3748]";
 
-const Post = ({ post }) => (
-  <div className={`border-t ${BORDER_COLOR} pt-4 mb-6`}>
-    <div className="flex space-x-3">
-      <img
-        src={`http://localhost:3000${post.User?.photo}`}
-        alt="Avatar"
-        className="w-10 h-10 rounded-full"
-      />
+const Post = ({ post }) => {
+  const navigate = useNavigate();
+  function goToProfile() {
+    if (post.User?.id) {
+      navigate(`/profile/${post.User.id}`);
+    }
+  }
+  return (
+    <div className={`border-t ${BORDER_COLOR} pt-4 mb-6`}>
+      <div className="flex space-x-3">
+        <img
+          onClick={goToProfile}
+          src={`http://localhost:3000${post.User?.photo}`}
+          alt="Avatar"
+          className="w-10 h-10 rounded-full cursor-pointer hover:opacity-80"
+        />
 
-      <div className="flex-1">
-        <p className={`font-semibold ${TEXT_PRIMARY}`}>
-          {post.User?.name || post.user}{" "}
-          <span className={`text-sm font-normal ${TEXT_SECONDARY}`}>
-            @{post.User?.userName || post.handle}
-          </span>
-        </p>
+        <div className="flex-1">
+          <p
+            className={`font-semibold ${TEXT_PRIMARY} cursor-pointer hover:opacity-80`}
+            onClick={goToProfile}
+          >
+            {post.User?.name || post.user}{" "}
+            <span
+              className={`text-sm font-normal ${TEXT_SECONDARY} cursor-pointer hover:opacity-80`}
+              onClick={goToProfile}
+            >
+              @{post.User?.userName || post.handle}
+            </span>
+          </p>
 
-        <p className={`mt-1 text-sm ${TEXT_PRIMARY}`}>{post.text || post.content}</p>
+          <p className={`mt-1 text-sm ${TEXT_PRIMARY}`}>
+            {post.text || post.content}
+          </p>
 
-        {post.imageUrl && (
-          <img
-            src={`http://localhost:3000${post.imageUrl}`}
-            alt="Imagem do Post"
-            className="w-full rounded-lg shadow-md mt-3"
-            style={{ maxWidth: "500px" }}
-          />
-        )}
+          {post.imageUrl && (
+            <img
+              src={`http://localhost:3000${post.imageUrl}`}
+              alt="Imagem do Post"
+              className="w-full rounded-lg shadow-md mt-3"
+              style={{ maxWidth: "500px" }}
+            />
+          )}
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default function Comunidade() {
   const [posts, setPosts] = useState([]);
@@ -86,7 +104,6 @@ export default function Comunidade() {
 
       <div className={`ml-64 mt-[76px] p-8 pb-28 ${BG_DARK} min-h-screen`}>
         <div className="max-w-4xl mx-auto">
-
           {/* FORMULÁRIO DE CRIAR POST */}
           <form
             onSubmit={handleCreatePost}

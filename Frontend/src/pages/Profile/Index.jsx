@@ -1,23 +1,78 @@
 import "./Profile.css";
-import { useState, useEffect, useRef } from "react";
+import { useParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { useState, useEffect, useRef } from "react";
+import axios from "axios";
+
 import Header from "../../components/Header/Index";
 import Navbar from "../../components/Navbar/Index";
-
 import TabsComunidades from "../../components/Tabs/TabsComunidades/Index";
 import TabsMusicas from "../../components/Tabs/TabsMusicas/Index";
 
 export default function Profile() {
+  const { id } = useParams();
   const { user, updateUser } = useAuth();
+
+  const [profileUser, setProfileUser] = useState(null);
   const [isEditingBio, setIsEditingBio] = useState(false);
-  const [tempBio, setTempBio] = useState(user?.bio || "");
+  const [tempBio, setTempBio] = useState("");
 
   const [activeTab, setActiveTab] = useState("musicas");
-  const [menuOpen, setMenuOpen] = useState(false); // controla dropdown
-  const menuRef = useRef(null); // referência ao dropdown
+  const [menuOpen, setMenuOpen] = useState(false);
 
-  const switchTab = (tabName) => setActiveTab(tabName);
+  const menuRef = useRef(null);
 
+  const isOwner = user?.id === profileUser?.id;
+
+  // ===============================
+  // BUSCA DADOS DO PERFIL
+  // ===============================
+  useEffect(() => {
+    axios
+      .get(`http://localhost:3000/users/${id}`)
+      .then((res) => setProfileUser(res.data))
+      .catch((err) => console.error(err));
+  }, [id]);
+
+  // ===============================
+  // FECHAR MENU AO CLICAR FORA
+  // ===============================
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // ===============================
+  // SINCRONIZAR BIO COM A DO PROFILE USER
+  // ===============================
+  useEffect(() => {
+    if (profileUser) {
+      setTempBio(profileUser.bio || "");
+    }
+  }, [profileUser]);
+
+  // ===============================
+  // SE PERFIL AINDA NÃO CARREGOU
+  // ===============================
+  if (!profileUser) {
+    return (
+      <>
+        <Header />
+        <Navbar />
+        <p className="text-white pb-28">Carregando...</p>
+      </>
+    );
+  }
+
+  // ===============================
+  // SALVAR BIO
+  // ===============================
   const handleBioSave = async () => {
     setIsEditingBio(false);
 
@@ -30,58 +85,17 @@ export default function Profile() {
 
       if (!res.ok) throw new Error("Erro ao salvar bio no servidor");
 
-      updateUser({ bio: tempBio }); // atualiza o usuário global
+      updateUser({ bio: tempBio });
+
+      setProfileUser((prev) => ({ ...prev, bio: tempBio }));
     } catch (error) {
       alert("Erro ao salvar bio: " + error.message);
     }
   };
 
-  const handleBioClick = () => {
-    setIsEditingBio(true);
-    setTempBio(user?.bio || "");
-  };
-
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case "musicas":
-        return <TabsMusicas />;
-      case "comunidades":
-        return (
-          <div className="flex justify-center">
-            <div className="grid grid-cols-3 justify-around">
-              <TabsComunidades />
-              <TabsComunidades />
-              <TabsComunidades />
-              <TabsComunidades />
-              <TabsComunidades />
-              <TabsComunidades />
-            </div>
-          </div>
-        );
-      default:
-        return null;
-    }
-  };
-
-  const handleLogout = () => {
-    alert("Logout realizado!");
-    window.location.href = "/login"; // redireciona para login
-  };
-
-  // Fecha o dropdown ao clicar fora
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setMenuOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
+  // ===============================
+  // ALTERAR FOTO DO PERFIL
+  // ===============================
   const handlePhotoChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -98,14 +112,50 @@ export default function Profile() {
       if (!res.ok) throw new Error("Erro ao enviar foto");
 
       const data = await res.json();
-
-      // Atualiza o usuário globalmente (AuthContext)
       updateUser({ photo: data.photo });
     } catch (error) {
       alert("Erro ao atualizar foto: " + error.message);
     }
   };
 
+  // ===============================
+  // LOGOUT
+  // ===============================
+  const handleLogout = () => {
+    alert("Logout realizado!");
+    window.location.href = "/login";
+  };
+
+  // ===============================
+  // RENDERIZAR TABS
+  // ===============================
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case "musicas":
+        return <TabsMusicas />;
+
+      case "comunidades":
+        return (
+          <div className="flex justify-center">
+            <div className="grid grid-cols-3 justify-around">
+              <TabsComunidades />
+              <TabsComunidades />
+              <TabsComunidades />
+              <TabsComunidades />
+              <TabsComunidades />
+              <TabsComunidades />
+            </div>
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  // ===========================================================
+  // RENDER PRINCIPAL
+  // ===========================================================
   return (
     <>
       <Header />
@@ -113,14 +163,20 @@ export default function Profile() {
 
       <div className="pb-28">
         <div className="profile-main">
+          {/* Banner */}
           <div className="profile-banner"></div>
 
+          {/* Foto */}
           <div className="profile-photo">
             <img
-              src={`http://localhost:3000${user?.photo}`}
+              src={`http://localhost:3000${profileUser.photo}`}
               alt="Foto de Perfil"
               className="cursor-pointer"
-              onClick={() => document.getElementById("photoInput").click()}
+              onClick={
+                isOwner
+                  ? () => document.getElementById("photoInput").click()
+                  : null
+              }
             />
 
             <input
@@ -132,49 +188,57 @@ export default function Profile() {
             />
           </div>
 
+          {/* Botões */}
           <div className="profile-buttons relative">
-            <button className="msg-button">Mensagem</button>
-            <button className="follow-button">Seguir</button>
-
-            {/* Botão de menu */}
-            <button
-              className="btn-icon"
-              onClick={() => setMenuOpen((prev) => !prev)}
-            >
-              <ion-icon name="ellipsis-horizontal-outline"></ion-icon>
-            </button>
-
-            {/* Dropdown */}
-            {menuOpen && (
-              <div
-                ref={menuRef}
-                className="absolute right-0 mt-2 w-40 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded shadow-lg z-50"
-              >
+            {!isOwner ? (
+              <>
+                <button className="msg-button">Mensagem</button>
+                <button className="follow-button">Seguir</button>
+              </>
+            ) : (
+              <>
                 <button
-                  className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
-                  onClick={() => {
-                    setMenuOpen(false);
-                    setIsEditingBio(true);
-                  }}
+                  className="btn-icon"
+                  onClick={() => setMenuOpen((prev) => !prev)}
                 >
-                  Mudar Bio
+                  <ion-icon name="ellipsis-horizontal-outline"></ion-icon>
                 </button>
-                <button
-                  className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
-                  onClick={handleLogout}
-                >
-                  Sair da Conta
-                </button>
-              </div>
+
+                {menuOpen && (
+                  <div
+                    ref={menuRef}
+                    className="absolute right-0 mt-2 w-40 bg-white dark:bg-gray-800 
+                    border border-gray-300 dark:border-gray-600 rounded shadow-lg z-50"
+                  >
+                    <button
+                      className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+                      onClick={() => {
+                        setMenuOpen(false);
+                        setIsEditingBio(true);
+                      }}
+                    >
+                      Mudar Bio
+                    </button>
+
+                    <button
+                      className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+                      onClick={handleLogout}
+                    >
+                      Sair da Conta
+                    </button>
+                  </div>
+                )}
+              </>
             )}
           </div>
 
+          {/* Infos */}
           <div className="profile-info">
-            <h1 className="profile-name">{user?.name}</h1>
-            <p className="profile-username">@{user?.userName}</p>
+            <h1 className="profile-name">{profileUser.name}</h1>
+            <p className="profile-username">@{profileUser.userName}</p>
 
             <p className="profile-description">
-              {isEditingBio ? (
+              {isEditingBio && isOwner ? (
                 <textarea
                   autoFocus
                   value={tempBio}
@@ -190,12 +254,17 @@ export default function Profile() {
                   rows={3}
                 />
               ) : (
-                <p onClick={handleBioClick} className="cursor-pointer">
-                  {user?.bio || "Clique para adicionar uma bio"}
+                <p
+                  className={isOwner ? "cursor-pointer" : ""}
+                  onClick={isOwner ? () => setIsEditingBio(true) : undefined}
+                >
+                  {profileUser?.bio ||
+                    (isOwner ? "Clique para adicionar uma bio" : "")}
                 </p>
               )}
             </p>
 
+            {/* Estatísticas */}
             <div className="profile-stats">
               <div className="stat-item">
                 <span className="stat-number">247</span>
@@ -209,22 +278,22 @@ export default function Profile() {
             </div>
           </div>
 
+          {/* Tabs */}
           <div className="tab-navigation">
             <button
-              id="tab-musicas"
               className={`tab-button ${
                 activeTab === "musicas" ? "active" : ""
               }`}
-              onClick={() => switchTab("musicas")}
+              onClick={() => setActiveTab("musicas")}
             >
               Músicas
             </button>
+
             <button
-              id="tab-comunidades"
               className={`tab-button ${
                 activeTab === "comunidades" ? "active" : ""
               }`}
-              onClick={() => switchTab("comunidades")}
+              onClick={() => setActiveTab("comunidades")}
             >
               Comunidades
             </button>

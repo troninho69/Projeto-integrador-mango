@@ -1,5 +1,4 @@
 import "./Header.css";
-import Profile from "../../assets/img/Pfp.jpg";
 import { useAuth } from "../../context/AuthContext";
 import { Link } from "react-router-dom";
 
@@ -10,14 +9,9 @@ export default function Header() {
     <header className="fixed top-0 left-0 right-0 shadow-lg z-50 bg-[#FFBE73] dark:bg-[#1f1f1f]">
       <div className="container mx-auto px-4 py-3">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-
           {/* Logo */}
           <div className="flex justify-center items-center w-64">
-            <img
-              src="./mangoLogo.png"
-              alt="Logo Mango"
-              className="w-12"
-            />
+            <img src="/mangoLogo.png" alt="Logo Mango" className="w-12" />
           </div>
 
           {/* Barra de pesquisa */}
@@ -37,17 +31,20 @@ export default function Header() {
           {/* Perfil ou login/registro */}
           {isLogged ? (
             <div className="user-profile-header hidden md:flex items-center space-x-3 cursor-pointer px-4 py-2 rounded-lg transition-all duration-300">
-              <Link to="/Profile">
+              {/* Nome leva ao perfil */}
+              <Link to={`/profile/${user?.id}`}>
                 <span className="user-name font-medium text-sm md:text-base transition-colors text-[#B15B3C] dark:text-white">
                   {user?.userName}
                 </span>
               </Link>
-              <Link to="/Profile">
+
+              {/* Foto leva ao perfil */}
+              <Link to={`/profile/${user?.id}`}>
                 <img
-              src={`http://localhost:3000${user?.photo}`}
-              alt="Foto de Perfil"
-              className="cursor-pointer w-10 h-10 rounded-full border-2 shadow-md border-white"
-            />
+                  src={`http://localhost:3000${user?.photo}`}
+                  alt="Foto de Perfil"
+                  className="cursor-pointer w-10 h-10 rounded-full border-2 shadow-md border-white"
+                />
               </Link>
             </div>
           ) : (
@@ -58,6 +55,7 @@ export default function Header() {
               >
                 Login
               </Link>
+
               <Link
                 to="/Register"
                 className="px-4 py-2 bg-white text-[#FF8C6B] dark:text-[#ffffff] dark:bg-[#555] font-medium rounded-full border border-[#FF8C6B] dark:border-black hover:bg-[#FF8C6B] dark:hover:bg-[#727272] transition-all duration-300 shadow-md"

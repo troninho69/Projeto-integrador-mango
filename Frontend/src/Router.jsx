@@ -16,7 +16,7 @@ export default function AppRoutes() {
     <Routes>
       <Route path="/" element={<Main isLoggedIn={isLoggedIn}/>} />
       <Route path="/Library" element={<Library isLoggedIn={isLoggedIn}/>} />
-      <Route path="/Profile" element={<Profile isLoggedIn={isLoggedIn}/>} />
+      <Route path="/profile/:id" element={<Profile />} />
       <Route path="/Msg" element={<Msg isLoggedIn={isLoggedIn}/>} />
       <Route path="/Login" element={<Login isLoggedIn={isLoggedIn}/>}/>
       <Route path="/Register" element={<Register isLoggedIn={isLoggedIn}/>}/>
