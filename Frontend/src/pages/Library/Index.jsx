@@ -1,21 +1,38 @@
 import "./Library.css";
+import { useAuth } from "../../context/AuthContext.jsx";
+
+
+
+
+import { useEffect, useState } from "react";
 
 import Header from "../../components/Header/Index";
 import Navbar from "../../components/Navbar/Index";
 import Footer from "../../components/Footer/Index";
 
-import Music from "../../components/Music";
+import Music from "../../components/Music/Index.jsx";
 import Discoteca from "../../components/Discoteca/Index";
 import Artists from "../../components/Artists/Index";
 import Comunitycards from "../../components/Comunitycards/Index";
 import Avaliacoes from "../../components/Avaliacoes";
 
-import Music1 from "../../assets/img/bodycompany.jpg";
-import Music2 from "../../assets/img/idontlikeyourtone.jpg";
-import Music3 from "../../assets/img/IMpossible.jpg";
-import Music4 from "../../assets/img/nude.jpg";
-
 export default function Library() {
+  const { user } = useAuth();
+  const [recentSongs, setRecentSongs] = useState([]);
+  const [lastPlayed, setLastPlayed] = useState(null);
+  useEffect(() => {
+    const savedLast = localStorage.getItem(`lastPlayedSong_${user.id}`);
+    if (savedLast) {
+      setLastPlayed(JSON.parse(savedLast));
+    }
+
+    const savedList = JSON.parse(localStorage.getItem(`recentSongs_${user.id}`));
+
+    if (savedList) {
+      setRecentSongs(savedList);
+    }
+  }, []);
+
   return (
     <>
       <Header />
@@ -24,51 +41,24 @@ export default function Library() {
       <main className="ml-32 md:ml-64 mt-[76px] p-8">
         <div className="pb-20">
           <div className="max-w-6xl mx-auto text-[#B15B3C] dark:text-white">
-            <h2 className="text-3xl font-bold mb-1">Atividade recente</h2>
-            <p className="mb-6">Músicas tocadas recentemente</p>
+            <h2 className="text-3xl font-bold mb-1">Escute novamente</h2>
+            <p className="mb-6">Músicas que você já escutou</p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <Music
-                titulo="IMpossible"
-                tempo="03:39"
-                autor="And One"
-                img={Music3}
-              />
-
-              <Music
-                titulo="IMpossible"
-                tempo="03:39"
-                autor="And One"
-                img={Music3}
-              />
-
-              <Music
-                titulo="IMpossible"
-                tempo="03:39"
-                autor="And One"
-                img={Music3}
-              />
-
-              <Music
-                titulo="IMpossible"
-                tempo="03:39"
-                autor="And One"
-                img={Music3}
-              />
-
-              <Music
-                titulo="IMpossible"
-                tempo="03:39"
-                autor="And One"
-                img={Music3}
-              />
-
-              <Music
-                titulo="IMpossible"
-                tempo="03:39"
-                autor="And One"
-                img={Music3}
-              />
+              {recentSongs.length > 0 ? (
+                recentSongs.map((song) => (
+                  <Music
+                    key={song.id}
+                    titulo={song.title}
+                    tempo={song.duration?.slice(0, 5) || "00:00"}
+                    autor={song.artist}
+                    img={song.cover}
+                    onClick={() => handlePlay(song)}
+                  />
+                ))
+              ) : (
+                <p>Nenhuma música tocada ainda.</p>
+              )}
             </div>
           </div>
         </div>

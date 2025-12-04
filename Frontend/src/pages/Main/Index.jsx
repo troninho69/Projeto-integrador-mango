@@ -40,18 +40,48 @@ function getMusicUrl(path) {
 export default function Secao() {
   const [songs, setSongs] = useState([]);
   const [currentSong, setCurrentSong] = useState(null);
+  const [recentSongs, setRecentSongs] = useState([]);
+
+  useEffect(() => {
+    const saved = JSON.parse(localStorage.getItem("recentSongs"));
+    if (saved) setRecentSongs(saved);
+  }, []);
 
   useEffect(() => {
     getSongs().then((data) => setSongs(data));
   }, []);
+
   const handlePlay = (song) => {
-    console.log(getMusicUrl(song.path))
+    const playedSong = {
+      id: song.id,
+      title: song.title,
+      artist: song.artist,
+      cover: getCoverUrl(song.cover),
+      duration: song.duration,
+    };
+
+    // Salvar no player atual
     setCurrentSong({
       title: song.title,
       artist: song.artist,
       cover: getCoverUrl(song.cover),
       file: getMusicUrl(song.path),
     });
+
+    // 📌 Salvar histórico local
+    const history = JSON.parse(localStorage.getItem("recentSongs")) || [];
+
+    // Se já existir, remove pra evitar duplicação
+    const filtered = history.filter((s) => s.id !== playedSong.id);
+
+    // Coloca no início
+    const updated = [playedSong, ...filtered];
+
+    // Limita a 20 músicas
+    const limited = updated.slice(0, 20);
+
+    localStorage.setItem(`recentSongs_${user.id}`, JSON.stringify(limited));
+
   };
 
   return (
