@@ -138,6 +138,7 @@ export default function Secao() {
                 tempo={song.duration?.slice(0, 5) || "00:00"}
                 autor={song.artist}
                 img={getCoverUrl(song.cover)}
+                liked={song.liked}
                 onClick={() => handlePlay(song)}
                 onLike={handleLike}
               />

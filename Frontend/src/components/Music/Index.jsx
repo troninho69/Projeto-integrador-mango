@@ -1,16 +1,17 @@
 import { useState } from "react";
 
-export default function Music({ 
-  id, 
-  titulo, 
-  tempo, 
-  autor, 
-  img, 
-  onClick, 
-  onLike // função para avisar o backend
+export default function Music({
+  id,
+  titulo,
+  tempo,
+  autor,
+  img,
+  liked: initialLiked,   // <--- receba do pai
+  onClick,
+  onLike
 }) {
 
-  const [liked, setLiked] = useState(false); // controla o coração
+  const [liked, setLiked] = useState(initialLiked); // controla o coração
 
   function handleLike(e) {
     e.stopPropagation(); // impede de ativar o onClick da música

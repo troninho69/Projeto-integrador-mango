@@ -1,6 +1,13 @@
 import { createDatabase } from "../config/createDatabase.js";
 import sequelize from "../config/database.js";
 
+
+import "../models/user.js";
+import "../models/music.js";
+import "../models/post.js";
+import "../models/like.js";
+import "../models/associations.js";
+
 // Importar as funções dos seeders
 import { seedMusics } from "./20251201001853-musicas.js";
 import { seedUsers } from "./20251201135011-users.js";

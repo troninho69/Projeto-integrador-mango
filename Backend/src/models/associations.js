@@ -21,14 +21,18 @@ User.belongsToMany(Music, {
   through: Like,
   as: "likedSongs",
   foreignKey: "userId",
+  otherKey: "musicId",
 });
 
 Music.belongsToMany(User, {
   through: Like,
   as: "likedBy",
   foreignKey: "musicId",
+  otherKey: "userId",
 });
 
+Like.belongsTo(User, { foreignKey: "userId" });
+Like.belongsTo(Music, { foreignKey: "musicId" });
 
 User.hasMany(Post, { foreignKey: "userId", onDelete: "CASCADE" });
 Post.belongsTo(User, { foreignKey: "userId" });
