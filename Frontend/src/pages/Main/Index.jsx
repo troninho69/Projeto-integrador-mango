@@ -12,6 +12,7 @@ import Discoteca from "../../components/Discoteca/Index.jsx";
 import Clipes from "../../components/Clipes/Index.jsx";
 
 import Player from "../../components/Player/Index.jsx";
+import { useAuth } from "../../context/AuthContext.jsx";
 
 function getCoverUrl(cover) {
   if (!cover) return "/default-music.jpg";
@@ -38,14 +39,16 @@ function getMusicUrl(path) {
 }
 
 export default function Secao() {
+  const { user } = useAuth();
   const [songs, setSongs] = useState([]);
   const [currentSong, setCurrentSong] = useState(null);
   const [recentSongs, setRecentSongs] = useState([]);
 
   useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem("recentSongs"));
+    if (!user) return;
+    const saved = JSON.parse(localStorage.getItem(`recentSongs_${user.id}`));
     if (saved) setRecentSongs(saved);
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     getSongs().then((data) => setSongs(data));
@@ -60,7 +63,7 @@ export default function Secao() {
       duration: song.duration,
     };
 
-    // Salvar no player atual
+    // Atualiza player
     setCurrentSong({
       title: song.title,
       artist: song.artist,
@@ -68,21 +71,24 @@ export default function Secao() {
       file: getMusicUrl(song.path),
     });
 
-    // 📌 Salvar histórico local
-    const history = JSON.parse(localStorage.getItem("recentSongs")) || [];
+    // Histórico local
+    const history =
+      JSON.parse(localStorage.getItem(`recentSongs_${user.id}`)) || [];
 
-    // Se já existir, remove pra evitar duplicação
     const filtered = history.filter((s) => s.id !== playedSong.id);
 
-    // Coloca no início
     const updated = [playedSong, ...filtered];
 
-    // Limita a 20 músicas
     const limited = updated.slice(0, 20);
 
-    localStorage.setItem(`recentSongs_${user.id}`, JSON.stringify(limited));
+    localStorage.setItem(
+      `recentSongs_${user.id}`,
+      JSON.stringify(limited)
+    );
 
+    setRecentSongs(limited);
   };
+
 
   return (
     <>
@@ -201,5 +207,6 @@ export default function Secao() {
       {currentSong && <Player song={currentSong} />}
       <Footer />
     </>
+    
   );
 }

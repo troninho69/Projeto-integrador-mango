@@ -1,9 +1,5 @@
 import "./Library.css";
 import { useAuth } from "../../context/AuthContext.jsx";
-
-
-
-
 import { useEffect, useState } from "react";
 
 import Header from "../../components/Header/Index";
@@ -18,20 +14,23 @@ import Avaliacoes from "../../components/Avaliacoes";
 
 export default function Library() {
   const { user } = useAuth();
+
   const [recentSongs, setRecentSongs] = useState([]);
   const [lastPlayed, setLastPlayed] = useState(null);
+
   useEffect(() => {
+    if (!user) return;
     const savedLast = localStorage.getItem(`lastPlayedSong_${user.id}`);
     if (savedLast) {
       setLastPlayed(JSON.parse(savedLast));
     }
 
     const savedList = JSON.parse(localStorage.getItem(`recentSongs_${user.id}`));
-
     if (savedList) {
       setRecentSongs(savedList);
     }
-  }, []);
+  }, [user]);
+  
 
   return (
     <>
@@ -53,7 +52,6 @@ export default function Library() {
                     tempo={song.duration?.slice(0, 5) || "00:00"}
                     autor={song.artist}
                     img={song.cover}
-                    onClick={() => handlePlay(song)}
                   />
                 ))
               ) : (

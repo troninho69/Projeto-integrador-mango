@@ -238,7 +238,7 @@ export default function Profile() {
             <h1 className="profile-name">{profileUser.name}</h1>
             <p className="profile-username">@{profileUser.userName}</p>
 
-            <p className="profile-description">
+            <div className="profile-description">
               {isEditingBio && isOwner ? (
                 <textarea
                   autoFocus
@@ -263,7 +263,7 @@ export default function Profile() {
                     (isOwner ? "Clique para adicionar uma bio" : "")}
                 </p>
               )}
-            </p>
+            </div>
 
             {/* Estatísticas */}
             <div className="profile-stats">
