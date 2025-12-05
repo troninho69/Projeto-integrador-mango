@@ -9,7 +9,6 @@ import express from "express";
 
 import "./src/models/user.js";
 import "./src/models/music.js";
-import "./src/models/album.js";
 import "./src/models/post.js";
 import "./src/models/associations.js";
 

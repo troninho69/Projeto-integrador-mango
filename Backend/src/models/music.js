@@ -31,15 +31,6 @@ Music.init(
       allowNull: false,
     },
 
-    albumId: {
-      type: DataTypes.INTEGER,
-      allowNull: true, // música pode ser single
-      references: {
-        model: "albums",
-        key: "id",
-      },
-    },
-
     duration: {
       type: DataTypes.TIME, // pode armazenar formato hh:mm:ss
       allowNull: false,

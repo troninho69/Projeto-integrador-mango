@@ -1,7 +1,7 @@
 import User from "./user.js";
 import Music from "./music.js";
-import Album from "./album.js";
 import Post from "./post.js";
+import Like from "./likes.js";
 
 // Auto-relacionamento: usuários seguindo outros usuários
 User.belongsToMany(User, {
@@ -18,28 +18,19 @@ User.belongsToMany(User, {
 
 // Relacionamento entre: usuários curtindo musicas
 User.belongsToMany(Music, {
-  through: "user_song_likes", // tabela intermediária
-  as: "likedSongs", // músicas que o usuário curtiu
+  through: Like,
+  as: "likedSongs",
   foreignKey: "userId",
 });
 
 Music.belongsToMany(User, {
-  through: "user_song_likes",
-  as: "likedBy", // usuários que curtiram essa música
-  foreignKey: "songId",
+  through: Like,
+  as: "likedBy",
+  foreignKey: "musicId",
 });
 
-// Um Álbum tem várias músicas
-Album.hasMany(Music, {
-  foreignKey: "albumId",
-  as: "songs",
-});
-
-// Uma música pertence a um álbum
-Music.belongsTo(Album, {
-  foreignKey: "albumId",
-  as: "album",
-});
 
 User.hasMany(Post, { foreignKey: "userId", onDelete: "CASCADE" });
 Post.belongsTo(User, { foreignKey: "userId" });
+
+export { User, Music, Post, Like };

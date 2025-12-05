@@ -1,4 +1,30 @@
-export default function Music({ titulo, tempo, autor, img, onClick }) {
+import { useState } from "react";
+
+export default function Music({ 
+  id, 
+  titulo, 
+  tempo, 
+  autor, 
+  img, 
+  onClick, 
+  onLike // função para avisar o backend
+}) {
+
+  const [liked, setLiked] = useState(false); // controla o coração
+
+  function handleLike(e) {
+    e.stopPropagation(); // impede de ativar o onClick da música
+
+    const newState = !liked;
+    setLiked(newState);
+
+    // envia para o backend
+    if (onLike) {
+      onLike(id, newState); 
+      // newState = true (curtiu) | false (descurtiu)
+    }
+  }
+
   return (
     <div
       className="bg-white rounded-2xl shadow-lg p-3 flex items-center gap-4 hover:shadow-xl transition-shadow duration-300 cursor-pointer"
@@ -17,7 +43,12 @@ export default function Music({ titulo, tempo, autor, img, onClick }) {
       </div>
 
       <div className="flex flex-col items-center justify-center h-full text-gray-400 py-1">
-        <button className="hover:text-red-500 transition-colors">
+        <button
+          className={`cursor-pointer transition-colors ${
+            liked ? "text-red-500" : "text-gray-400"
+          }`}
+          onClick={handleLike}
+        >
           <ion-icon name="heart-sharp"></ion-icon>
         </button>
       </div>

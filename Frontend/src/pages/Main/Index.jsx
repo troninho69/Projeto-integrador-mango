@@ -2,6 +2,7 @@ import "./Main.css";
 
 import { useEffect, useState } from "react";
 import { getSongs } from "../../services/songService";
+import axios from "axios";
 
 import Header from "../../components/Header/Index.jsx";
 import Navbar from "../../components/Navbar/Index.jsx";
@@ -17,24 +18,14 @@ import { useAuth } from "../../context/AuthContext.jsx";
 function getCoverUrl(cover) {
   if (!cover) return "/default-music.jpg";
 
-  // SEED → já vem com "covers/arquivo.jpg"
-  if (cover.startsWith("covers/")) {
-    return `http://localhost:3000/${cover}`;
-  }
-
-  // UPLOAD → vem apenas "arquivo.jpg"
+  if (cover.startsWith("covers/")) return `http://localhost:3000/${cover}`;
   return `http://localhost:3000/covers/${cover}`;
 }
 
 function getMusicUrl(path) {
   if (!path) return null;
 
-  // SEED → já vem com "musics/arquivo.mp3"
-  if (path.startsWith("musics/")) {
-    return `http://localhost:3000/${path}`;
-  }
-
-  // UPLOAD → vem apenas "arquivo.mp3"
+  if (path.startsWith("musics/")) return `http://localhost:3000/${path}`;
   return `http://localhost:3000/musics/${path}`;
 }
 
@@ -44,15 +35,32 @@ export default function Secao() {
   const [currentSong, setCurrentSong] = useState(null);
   const [recentSongs, setRecentSongs] = useState([]);
 
+  // Carregar histórico local
   useEffect(() => {
     if (!user) return;
     const saved = JSON.parse(localStorage.getItem(`recentSongs_${user.id}`));
     if (saved) setRecentSongs(saved);
   }, [user]);
 
+  // Carregar músicas da API
   useEffect(() => {
-    getSongs().then((data) => setSongs(data));
-  }, []);
+    getSongs().then(async (data) => {
+      // depois que pega as músicas, precisa carregar status de like para cada música
+      const songsWithLikes = await Promise.all(
+        data.map(async (song) => {
+          if (!user) return { ...song, liked: false };
+
+          const res = await axios.get(
+            `http://localhost:3000/liked/${user.id}/${song.id}`
+          );
+
+          return { ...song, liked: res.data.liked };
+        })
+      );
+
+      setSongs(songsWithLikes);
+    });
+  }, [user]);
 
   const handlePlay = (song) => {
     const playedSong = {
@@ -63,7 +71,6 @@ export default function Secao() {
       duration: song.duration,
     };
 
-    // Atualiza player
     setCurrentSong({
       title: song.title,
       artist: song.artist,
@@ -71,7 +78,6 @@ export default function Secao() {
       file: getMusicUrl(song.path),
     });
 
-    // Histórico local
     const history =
       JSON.parse(localStorage.getItem(`recentSongs_${user.id}`)) || [];
 
@@ -81,15 +87,36 @@ export default function Secao() {
 
     const limited = updated.slice(0, 20);
 
-    localStorage.setItem(
-      `recentSongs_${user.id}`,
-      JSON.stringify(limited)
-    );
+    localStorage.setItem(`recentSongs_${user.id}`, JSON.stringify(limited));
 
     setRecentSongs(limited);
   };
 
+  // Curtir / Descurtir música
+  async function handleLike(musicId, liked) {
+    try {
+      if (liked) {
+        await axios.post("http://localhost:3000/like", {
+          musicId,
+          userId: user.id,
+        });
+      } else {
+        await axios.post("http://localhost:3000/unlike", {
+          musicId,
+          userId: user.id,
+        });
+      }
 
+      // atualizar estado local sem recarregar
+      setSongs((prev) =>
+        prev.map((s) =>
+          s.id === musicId ? { ...s, liked } : s
+        )
+      );
+    } catch (error) {
+      console.error("Erro ao enviar like:", error);
+    }
+  }
   return (
     <>
       <Header />
@@ -112,6 +139,7 @@ export default function Secao() {
                 autor={song.artist}
                 img={getCoverUrl(song.cover)}
                 onClick={() => handlePlay(song)}
+                onLike={handleLike}
               />
             ))}
           </div>
@@ -207,6 +235,5 @@ export default function Secao() {
       {currentSong && <Player song={currentSong} />}
       <Footer />
     </>
-    
   );
 }
