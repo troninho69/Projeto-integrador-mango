@@ -1,7 +1,7 @@
 import User from "./user.js";
 import Music from "./music.js";
 import Post from "./post.js";
-import Like from "./likes.js";
+import Like from "./like.js";
 
 // Auto-relacionamento: usuários seguindo outros usuários
 User.belongsToMany(User, {

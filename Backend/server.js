@@ -5,12 +5,11 @@ import app from "./src/app.js";
 import sequelize from "./src/config/database.js";
 import express from "express";
 
-
-
 import "./src/models/user.js";
 import "./src/models/music.js";
 import "./src/models/post.js";
 import "./src/models/associations.js";
+import "./src/models/like.js";
 
 const PORT = 3000;
 
