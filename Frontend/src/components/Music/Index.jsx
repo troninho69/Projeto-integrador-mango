@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function Music({
   id,
@@ -6,23 +6,26 @@ export default function Music({
   tempo,
   autor,
   img,
-  liked: initialLiked,   // <--- receba do pai
+  liked: initialLiked,
   onClick,
-  onLike
+  onLike,
 }) {
 
-  const [liked, setLiked] = useState(initialLiked); // controla o coração
+  const [liked, setLiked] = useState(initialLiked);
+
+  useEffect(() => {
+    setLiked(initialLiked);
+  }, [initialLiked]);
 
   function handleLike(e) {
-    e.stopPropagation(); // impede de ativar o onClick da música
+    e.stopPropagation(); 
 
     const newState = !liked;
     setLiked(newState);
 
-    // envia para o backend
+    // Envia o id da música para o pai
     if (onLike) {
-      onLike(id, newState); 
-      // newState = true (curtiu) | false (descurtiu)
+      onLike(id);   // <<--- AGORA ENVIA SÓ O ID
     }
   }
 

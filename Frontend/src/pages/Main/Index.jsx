@@ -93,30 +93,39 @@ export default function Secao() {
   };
 
   // Curtir / Descurtir música
-  async function handleLike(musicId, liked) {
-    try {
-      if (liked) {
-        await axios.post("http://localhost:3000/like", {
-          musicId,
-          userId: user.id,
-        });
-      } else {
-        await axios.post("http://localhost:3000/unlike", {
-          musicId,
-          userId: user.id,
-        });
-      }
-
-      // atualizar estado local sem recarregar
-      setSongs((prev) =>
-        prev.map((s) =>
-          s.id === musicId ? { ...s, liked } : s
-        )
-      );
-    } catch (error) {
-      console.error("Erro ao enviar like:", error);
-    }
+  const handleLike = async (musicId) => {
+  if (!user || !user.id) {
+    console.error("Usuário não está logado!");
+    return;
   }
+
+  const userId = user.id;
+
+  try {
+    console.log("Enviando LIKE:", { userId, musicId });
+
+    const response = await axios.post("http://localhost:3000/like", {
+      userId,
+      musicId,
+    });
+
+    console.log("Resposta do servidor:", response.data);
+
+    // Atualiza o estado para refletir no front
+    setSongs((prev) =>
+      prev.map((song) =>
+        song.id === musicId
+          ? { ...song, liked: true }
+          : song
+      )
+    );
+
+  } catch (error) {
+    console.error("Erro ao enviar like:", error);
+  }
+};
+
+
   return (
     <>
       <Header />
@@ -126,14 +135,15 @@ export default function Secao() {
         <div className="max-w-6xl mx-auto">
           {/* ESCUTE NOVAMENTE */}
           <div className="text-[#B15B3C] dark:text-white">
-            <h2 className="text-3xl font-bold mb-1">Escute novamente</h2>
-            <p className="mb-6">Músicas que em algum momento você escutou</p>
+            <h2 className="text-3xl font-bold mb-1">Músicas recem adicionadas</h2>
+            <p className="mb-6">Músicas que foram adicionadas recentemente</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {songs.map((song) => (
+            {songs.slice(0, 6).map((song) => (
               <Music
                 key={song.id}
+                id={song.id}
                 titulo={song.title}
                 tempo={song.duration?.slice(0, 5) || "00:00"}
                 autor={song.artist}
@@ -149,15 +159,15 @@ export default function Secao() {
           <div className="py-8">
             <div className="text-[#B15B3C] dark:text-white">
               <h2 className="text-3xl font-bold mb-1">
-                Descubra Novas Músicas
+                Músicas antigas
               </h2>
               <p className="mb-6">
-                Músicas recomendadas de acordo com seu gosto musical
+                Músicas que foram adicionadas antigamente
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-              {songs.map((song) => (
+              {songs.slice(6, 12).map((song) => (
                 <Music
                   key={song.id + "-discover"}
                   titulo={song.title}
@@ -177,7 +187,7 @@ export default function Secao() {
 
           <div className="max-w-6xl mx-auto">
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 mb-8">
-              {songs.map((song) => (
+              {songs.slice(0, 4).map((song) => (
                 <Discoteca
                   key={song.id + "-disc"}
                   img={getCoverUrl(song.cover)}
@@ -192,13 +202,13 @@ export default function Secao() {
 
           {/* FAVORITOS ANTIGOS */}
           <div className="text-[#B15B3C] dark:text-white">
-            <h2 className="text-3xl font-bold mb-1">Favoritos Antigos</h2>
-            <p className="mb-6">Musicas que você escutava antigamente</p>
+            <h2 className="text-3xl font-bold mb-1">Descubra mais</h2>
+            <p className="mb-6">Você pode gostar</p>
           </div>
 
           <div className="max-w-6xl mx-auto">
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 mb-8">
-              {songs.slice(0, 4).map((song) => (
+              {songs.slice(4, 8).map((song) => (
                 <Discoteca
                   key={song.id + "-old"}
                   titulo={song.title}
@@ -215,7 +225,7 @@ export default function Secao() {
           <div className="text-[#B15B3C] dark:text-white">
             <h2 className="text-3xl font-bold mb-1">Videoclipes</h2>
             <p className="mb-6">
-              Vídeoclipes de músicas relacionadas ao seu gosto musical
+              Vídeoclipes de músicas
             </p>
           </div>
 

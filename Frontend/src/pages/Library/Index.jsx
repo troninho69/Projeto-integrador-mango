@@ -12,13 +12,27 @@ import Discoteca from "../../components/Discoteca/Index";
 import Comunitycards from "../../components/Comunitycards/Index";
 import Avaliacoes from "../../components/Avaliacoes";
 
+function getCoverUrl(cover) {
+  if (!cover) return "/default-music.jpg";
+
+  // Se já vier com http, não mexe
+  if (cover.startsWith("http")) return cover;
+
+  // Se vier como "covers/xxx"
+  if (cover.startsWith("covers/")) return `http://localhost:3000/${cover}`;
+
+  // Se vier só o nome
+  return `http://localhost:3000/covers/${cover}`;
+}
+
 export default function Library() {
   const { user } = useAuth();
   const [songs, setSongs] = useState([]);
   const [recentSongs, setRecentSongs] = useState([]);
   const [lastPlayed, setLastPlayed] = useState(null);
+  const [likedIds, setLikedIds] = useState([]);
 
-  // Carregar músicas recentes do usuário e última ouvida
+  // 🔹 Carregar músicas recentes + última ouvida
   useEffect(() => {
     if (!user?.id) return;
 
@@ -29,14 +43,26 @@ export default function Library() {
     if (savedList) setRecentSongs(JSON.parse(savedList));
   }, [user]);
 
-  // Buscar músicas curtidas do usuário
+  // 🔹 Buscar músicas curtidas
   useEffect(() => {
     if (!user?.id) return;
 
     const fetchLikedSongs = async () => {
       try {
-        const res = await axios.get(`http://localhost:3000/liked-songs/${user.id}`);
-        setSongs(res.data);
+        const res = await axios.get(
+          `http://localhost:3000/liked-songs/${user.id}`
+        );
+
+        const corrected = res.data.map((song) => ({
+          ...song,
+          cover: getCoverUrl(song.cover),
+        }));
+
+        console.log("LIKED SONGS:", corrected);
+
+        setSongs(corrected);
+
+        setLikedIds(corrected.map((s) => s.id));
       } catch (err) {
         console.error("Erro ao buscar músicas curtidas:", err);
       }
@@ -44,6 +70,47 @@ export default function Library() {
 
     fetchLikedSongs();
   }, [user]);
+
+  // 🔹 Curtir / Descurtir música
+  const handleLike = async (musicId) => {
+    if (!user?.id) return;
+
+    try {
+      const response = await axios.post("http://localhost:3000/like", {
+        userId: user.id,
+        musicId,
+      });
+
+      const liked = response.data.liked;
+
+      if (liked) {
+        setLikedIds((prev) => [...prev, musicId]);
+
+        let addedSong =
+          recentSongs.find((s) => s.id === musicId) ||
+          songs.find((s) => s.id === musicId);
+
+        if (addedSong) {
+          // 🔥 Corrige a capa SEMPRE
+          addedSong = {
+            ...addedSong,
+            cover: getCoverUrl(addedSong.cover),
+          };
+
+          setSongs((prev) => {
+            if (prev.some((s) => s.id === musicId)) return prev;
+            return [...prev, addedSong];
+          });
+        }
+      } else {
+        // descurtiu
+        setLikedIds((prev) => prev.filter((id) => id !== musicId));
+        setSongs((prev) => prev.filter((s) => s.id !== musicId));
+      }
+    } catch (error) {
+      console.error("Erro ao curtir/descurtir:", error);
+    }
+  };
 
   return (
     <>
@@ -58,15 +125,20 @@ export default function Library() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {recentSongs.length > 0 ? (
-                recentSongs.map((song) => (
-                  <Music
-                    key={song.id}
-                    titulo={song.title}
-                    tempo={song.duration?.slice(0, 5) || "00:00"}
-                    autor={song.artist}
-                    img={song.cover}
-                  />
-                ))
+                recentSongs
+                  .slice(0, 6)
+                  .map((song) => (
+                    <Music
+                      key={song.id}
+                      id={song.id}
+                      titulo={song.title}
+                      tempo={song.duration?.slice(0, 5) || "00:00"}
+                      autor={song.artist}
+                      img={song.cover}
+                      liked={likedIds.includes(song.id)}
+                      onLike={handleLike}
+                    />
+                  ))
               ) : (
                 <p>Nenhuma música tocada ainda.</p>
               )}
@@ -79,9 +151,22 @@ export default function Library() {
             <h2 className="text-3xl font-bold mb-1">Favoritadas</h2>
             <p className="mb-6">Músicas que você curtiu</p>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {songs.length > 0 ? (
-                songs.map((music) => <MusicCard key={music.id} music={music} />)
+                songs
+                  .slice(0, 6)
+                  .map((song) => (
+                    <Music
+                      key={song.id}
+                      id={song.id}
+                      titulo={song.title}
+                      tempo={song.duration?.slice(0, 5) || "00:00"}
+                      autor={song.artist}
+                      img={song.cover}
+                      liked={likedIds.includes(song.id)}
+                      onLike={handleLike}
+                    />
+                  ))
               ) : (
                 <p>Você ainda não curtiu nenhuma música 🎵</p>
               )}
