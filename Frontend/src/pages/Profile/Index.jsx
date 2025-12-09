@@ -3,24 +3,29 @@ import { useParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
+import useFollow from "../../hooks/useFollow";
 
 import Header from "../../components/Header/Index";
 import Navbar from "../../components/Navbar/Index";
+import FollowButton from "../../components/followButton/FollowButton";
 
 export default function Profile() {
   const { id } = useParams();
-  const { user, updateUser } = useAuth();
-  const { logout } = useAuth();
+
+  // pegar tudo do Auth apenas uma vez
+  const { token, user, updateUser, logout } = useAuth();
 
   const [profileUser, setProfileUser] = useState(null);
   const [isEditingBio, setIsEditingBio] = useState(false);
   const [tempBio, setTempBio] = useState("");
-
   const [menuOpen, setMenuOpen] = useState(false);
 
   const menuRef = useRef(null);
 
-  const isOwner = user?.id === profileUser?.id;
+  const isOwner = user?.id === Number(id);
+
+  // hook de follow
+  const { isFollowing, counts, follow, unfollow } = useFollow(id, token);
 
   // ===============================
   // BUSCA DADOS DO PERFIL
@@ -47,7 +52,7 @@ export default function Profile() {
   }, []);
 
   // ===============================
-  // SINCRONIZAR BIO COM A DO PROFILE USER
+  // SINCRONIZAR BIO
   // ===============================
   useEffect(() => {
     if (profileUser) {
@@ -77,7 +82,10 @@ export default function Profile() {
     try {
       const res = await fetch(`http://localhost:3000/auth/bio/${user.id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({ bio: tempBio }),
       });
 
@@ -104,6 +112,7 @@ export default function Profile() {
     try {
       const res = await fetch(`http://localhost:3000/auth/photo/${user.id}`, {
         method: "PUT",
+        headers: { Authorization: `Bearer ${token}` },
         body: formData,
       });
 
@@ -111,6 +120,8 @@ export default function Profile() {
 
       const data = await res.json();
       updateUser({ photo: data.photo });
+
+      setProfileUser((prev) => ({ ...prev, photo: data.photo }));
     } catch (error) {
       alert("Erro ao atualizar foto: " + error.message);
     }
@@ -123,6 +134,7 @@ export default function Profile() {
     logout();
     window.location.href = "/login";
   };
+
   // ===========================================================
   // RENDER PRINCIPAL
   // ===========================================================
@@ -145,25 +157,30 @@ export default function Profile() {
               onClick={
                 isOwner
                   ? () => document.getElementById("photoInput").click()
-                  : null
+                  : undefined
               }
             />
 
-            <input
-              id="photoInput"
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handlePhotoChange}
-            />
+            {isOwner && (
+              <input
+                id="photoInput"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handlePhotoChange}
+              />
+            )}
           </div>
 
           {/* Botões */}
           <div className="profile-buttons relative">
             {!isOwner ? (
               <>
-                <button className="msg-button">Mensagem</button>
-                <button className="follow-button">Seguir</button>
+                <FollowButton
+                  isFollowing={isFollowing}
+                  follow={follow}
+                  unfollow={unfollow}
+                />
               </>
             ) : (
               <>
@@ -228,7 +245,7 @@ export default function Profile() {
                   className={isOwner ? "cursor-pointer" : ""}
                   onClick={isOwner ? () => setIsEditingBio(true) : undefined}
                 >
-                  {profileUser?.bio ||
+                  {profileUser.bio ||
                     (isOwner ? "Clique para adicionar uma bio" : "")}
                 </p>
               )}
@@ -237,20 +254,18 @@ export default function Profile() {
             {/* Estatísticas */}
             <div className="profile-stats">
               <div className="stat-item">
-                <span className="stat-number">247</span>
+                <span className="stat-number">{counts.seguindo}</span>
                 <span className="stat-label">Seguindo</span>
               </div>
 
               <div className="stat-item">
-                <span className="stat-number">1.234</span>
+                <span className="stat-number">{counts.seguidores}</span>
                 <span className="stat-label">Seguidores</span>
               </div>
             </div>
           </div>
 
-          <div className="tab-navigation">
-
-          </div>
+          <div className="tab-navigation"></div>
         </div>
       </div>
     </>

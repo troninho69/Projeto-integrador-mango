@@ -32,8 +32,22 @@ function getMusicUrl(path) {
 export default function Secao() {
   const { user } = useAuth();
   const [songs, setSongs] = useState([]);
+  const [filteredSongs, setFilteredSongs] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const [currentSong, setCurrentSong] = useState(null);
   const [recentSongs, setRecentSongs] = useState([]);
+
+  useEffect(() => {
+    const query = searchQuery.toLowerCase();
+
+    const results = songs.filter(
+      (song) =>
+        song.title.toLowerCase().includes(query) ||
+        song.artist.toLowerCase().includes(query)
+    );
+
+    setFilteredSongs(results);
+  }, [searchQuery, songs]);
 
   // Carregar histórico local
   useEffect(() => {
@@ -94,53 +108,53 @@ export default function Secao() {
 
   // Curtir / Descurtir música
   const handleLike = async (musicId) => {
-  if (!user || !user.id) {
-    console.error("Usuário não está logado!");
-    return;
-  }
+    if (!user || !user.id) {
+      console.error("Usuário não está logado!");
+      return;
+    }
 
-  const userId = user.id;
+    const userId = user.id;
 
-  try {
-    console.log("Enviando LIKE:", { userId, musicId });
+    try {
+      console.log("Enviando LIKE:", { userId, musicId });
 
-    const response = await axios.post("http://localhost:3000/like", {
-      userId,
-      musicId,
-    });
+      const response = await axios.post("http://localhost:3000/like", {
+        userId,
+        musicId,
+      });
 
-    console.log("Resposta do servidor:", response.data);
+      console.log("Resposta do servidor:", response.data);
 
-    // Atualiza o estado para refletir no front
-    setSongs((prev) =>
-      prev.map((song) =>
-        song.id === musicId
-          ? { ...song, liked: true }
-          : song
-      )
-    );
-
-  } catch (error) {
-    console.error("Erro ao enviar like:", error);
-  }
-};
-
+      // Atualiza o estado para refletir no front
+      setSongs((prev) =>
+        prev.map((song) =>
+          song.id === musicId ? { ...song, liked: true } : song
+        )
+      );
+    } catch (error) {
+      console.error("Erro ao enviar like:", error);
+    }
+  };
 
   return (
     <>
-      <Header />
+      <Header onSearch={setSearchQuery} />
       <Navbar />
 
       <div className="ml-32 md:ml-64 mt-[76px] p-8">
         <div className="max-w-6xl mx-auto">
           {/* ESCUTE NOVAMENTE */}
           <div className="text-[#B15B3C] dark:text-white">
-            <h2 className="text-3xl font-bold mb-1">Músicas recem adicionadas</h2>
-            <p className="mb-6">Músicas que foram adicionadas recentemente</p>
+            <h2 className="text-3xl font-bold mb-1">Músicas</h2>
+            <p className="mb-6">
+              {searchQuery
+                ? `Resultados para: "${searchQuery}"`
+                : "Músicas que foram adicionadas recentemente:"}
+            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {songs.slice(0, 6).map((song) => (
+            {filteredSongs.slice(0, 6).map((song) => (
               <Music
                 key={song.id}
                 id={song.id}
@@ -155,94 +169,95 @@ export default function Secao() {
             ))}
           </div>
 
-          {/* DESCUBRA NOVAS MÚSICAS */}
-          <div className="py-8">
-            <div className="text-[#B15B3C] dark:text-white">
-              <h2 className="text-3xl font-bold mb-1">
-                Músicas antigas
+          {searchQuery === "" && (
+            <>
+              {/* DESCUBRA NOVAS MÚSICAS */}
+              <div className="py-8">
+                <div className="text-[#B15B3C] dark:text-white">
+                  <h2 className="text-3xl font-bold mb-1">Músicas antigas</h2>
+                  <p className="mb-6">
+                    Músicas que foram adicionadas antigamente
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+                  {songs.slice(6, 12).map((song) => (
+                    <Music
+                      key={song.id + "-discover"}
+                      titulo={song.title}
+                      tempo={song.duration?.slice(0, 5)}
+                      autor={song.artist}
+                      img={getCoverUrl(song.cover)}
+                      onClick={() => handlePlay(song)}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* DISCOTECA DIGITAL */}
+              <h2 className="text-3xl font-bold mb-6 text-[#B15B3C] dark:text-white">
+                Discoteca Digital
               </h2>
-              <p className="mb-6">
-                Músicas que foram adicionadas antigamente
-              </p>
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-              {songs.slice(6, 12).map((song) => (
-                <Music
-                  key={song.id + "-discover"}
-                  titulo={song.title}
-                  tempo={song.duration?.slice(0, 5)}
-                  autor={song.artist}
-                  img={getCoverUrl(song.cover)}
-                  onClick={() => handlePlay(song)}
-                />
-              ))}
-            </div>
-          </div>
+              <div className="max-w-6xl mx-auto">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 mb-8">
+                  {songs.slice(0, 4).map((song) => (
+                    <Discoteca
+                      key={song.id + "-disc"}
+                      img={getCoverUrl(song.cover)}
+                      titulo={song.title}
+                      tempo={song.duration?.slice(0, 5)}
+                      autor={song.artist}
+                      onClick={() => handlePlay(song)}
+                    />
+                  ))}
+                </div>
+              </div>
 
-          {/* DISCOTECA DIGITAL */}
-          <h2 className="text-3xl font-bold mb-6 text-[#B15B3C] dark:text-white">
-            Discoteca Digital
-          </h2>
+              {/* FAVORITOS ANTIGOS */}
+              <div className="text-[#B15B3C] dark:text-white">
+                <h2 className="text-3xl font-bold mb-1">Descubra mais</h2>
+                <p className="mb-6">Você pode gostar</p>
+              </div>
 
-          <div className="max-w-6xl mx-auto">
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 mb-8">
-              {songs.slice(0, 4).map((song) => (
-                <Discoteca
-                  key={song.id + "-disc"}
-                  img={getCoverUrl(song.cover)}
-                  titulo={song.title}
-                  tempo={song.duration?.slice(0, 5)}
-                  autor={song.artist}
-                  onClick={() => handlePlay(song)}
-                />
-              ))}
-            </div>
-          </div>
+              <div className="max-w-6xl mx-auto">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 mb-8">
+                  {songs.slice(4, 8).map((song) => (
+                    <Discoteca
+                      key={song.id + "-old"}
+                      titulo={song.title}
+                      tempo={song.duration?.slice(0, 5)}
+                      autor={song.artist}
+                      img={getCoverUrl(song.cover)}
+                      onClick={() => handlePlay(song)}
+                    />
+                  ))}
+                </div>
+              </div>
 
-          {/* FAVORITOS ANTIGOS */}
-          <div className="text-[#B15B3C] dark:text-white">
-            <h2 className="text-3xl font-bold mb-1">Descubra mais</h2>
-            <p className="mb-6">Você pode gostar</p>
-          </div>
+              {/* VIDEOCLIPES */}
+              <div className="text-[#B15B3C] dark:text-white">
+                <h2 className="text-3xl font-bold mb-1">Videoclipes</h2>
+                <p className="mb-6">Vídeoclipes de músicas</p>
+              </div>
 
-          <div className="max-w-6xl mx-auto">
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 mb-8">
-              {songs.slice(4, 8).map((song) => (
-                <Discoteca
-                  key={song.id + "-old"}
-                  titulo={song.title}
-                  tempo={song.duration?.slice(0, 5)}
-                  autor={song.artist}
-                  img={getCoverUrl(song.cover)}
-                  onClick={() => handlePlay(song)}
-                />
-              ))}
-            </div>
-          </div>
-
-          {/* VIDEOCLIPES */}
-          <div className="text-[#B15B3C] dark:text-white">
-            <h2 className="text-3xl font-bold mb-1">Videoclipes</h2>
-            <p className="mb-6">
-              Vídeoclipes de músicas
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            {songs.map((song) => (
-              <Clipes
-                key={song.id + "-clip"}
-                titulo={song.title}
-                tempo={song.duration?.slice(0, 5)}
-                autor={song.artist}
-                img={getCoverUrl(song.cover)}
-                onClick={() => handlePlay(song)}
-              />
-            ))}
-          </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                {songs.map((song) => (
+                  <Clipes
+                    key={song.id + "-clip"}
+                    titulo={song.title}
+                    tempo={song.duration?.slice(0, 5)}
+                    autor={song.artist}
+                    img={getCoverUrl(song.cover)}
+                    onClick={() => handlePlay(song)}
+                  />
+                ))}
+              </div>
+            </>
+          )}
         </div>
       </div>
+
       {currentSong && <Player song={currentSong} />}
       <Footer />
     </>

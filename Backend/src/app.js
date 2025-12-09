@@ -5,6 +5,7 @@ import authRoutes from "./routes/authRoutes.js";
 import songRoutes from "./routes/songRoutes.js";
 import postRoutes from "./routes/postRoutes.js";
 import likeRoutes from './routes/likeRoutes.js';
+import followRoutes from "./routes/followRoutes.js";
 
 const app = express();
 
@@ -25,5 +26,6 @@ app.use("/auth", authRoutes);
 app.use("/songs", songRoutes);
 app.use("/posts", postRoutes);
 app.use("/", likeRoutes);
+app.use("/api", followRoutes);
 
 export default app;

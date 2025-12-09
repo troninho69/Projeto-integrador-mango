@@ -1,9 +1,16 @@
 import "./Header.css";
 import { useAuth } from "../../context/AuthContext";
 import { Link } from "react-router-dom";
+import { useState } from "react";
 
-export default function Header() {
-  const { isLogged, user } = useAuth(); // ✅ pegar o estado correto
+export default function Header({ onSearch }) {
+  const { isLogged, user } = useAuth();
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const handleTyping = (value) => {
+    setSearchTerm(value);
+    if (onSearch) onSearch(value); // 🔥 atualiza em tempo real
+  };
 
   return (
     <header className="fixed top-0 left-0 right-0 shadow-lg z-50 bg-[#FFBE73] dark:bg-[#1f1f1f]">
@@ -21,8 +28,12 @@ export default function Header() {
                 type="text"
                 placeholder="Pesquisar..."
                 className="bg-white dark:bg-black w-full px-4 py-2 pl-4 pr-16 text-gray-800 dark:text-white focus:outline-none transition-all duration-300 border-none"
+                value={searchTerm}
+                onChange={(e) => handleTyping(e.target.value)}
               />
-              <button className="absolute right-0 h-full px-6 text-white dark:text-black text-2xl transition-all duration-300 hover:opacity-90 flex items-center justify-center bg-[#FF8C6B] dark:bg-gray-50">
+              <button
+                className="absolute right-0 h-full px-6 text-white dark:text-black text-2xl transition-all duration-300 hover:opacity-90 flex items-center justify-center bg-[#FF8C6B] dark:bg-gray-50"
+              >
                 <ion-icon name="search-outline"></ion-icon>
               </button>
             </div>

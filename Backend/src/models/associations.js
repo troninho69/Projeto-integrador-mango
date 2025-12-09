@@ -2,18 +2,21 @@ import User from "./user.js";
 import Music from "./music.js";
 import Post from "./post.js";
 import Like from "./like.js";
+import Follow from "./follow.js";
 
 // Auto-relacionamento: usuários seguindo outros usuários
 User.belongsToMany(User, {
-  as: "seguindo", // usuários que ESTE usuário segue
-  through: "user_follows", // tabela intermediária
-  foreignKey: "followerId", // coluna que representa quem segue
+  as: "seguindo", 
+  through: Follow, 
+  foreignKey: "followerId",
+  otherKey: "followedId",
 });
 
 User.belongsToMany(User, {
-  as: "seguidores", // usuários que seguem ESTE usuário
-  through: "user_follows",
-  foreignKey: "followedId", // coluna que representa quem é seguido
+  as: "seguidores", 
+  through: Follow,
+  foreignKey: "followedId", 
+  otherKey: "followerId",
 });
 
 // Relacionamento entre: usuários curtindo musicas
