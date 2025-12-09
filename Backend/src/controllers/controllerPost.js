@@ -39,3 +39,64 @@ export async function getAllPosts(req, res) {
     res.status(500).json({ error: err.message });
   }
 }
+
+export async function deletePost(req, res) {
+  try {
+    const postId = req.params.id;
+
+    const post = await Post.findByPk(postId);
+
+    if (!post) {
+      return res.status(404).json({ error: "Post não encontrado" });
+    }
+
+    const isOwner = post.userId === req.user.id;
+    const isAdmin = req.user.role === "admin";
+    const isArtist = req.user.artist === true;
+
+    if (!isOwner && !isAdmin && !isArtist) {
+      return res.status(403).json({ error: "Sem permissão para deletar este post" });
+    }
+
+    await post.destroy();
+
+    res.json({ message: "Post deletado com sucesso" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}
+
+export async function updatePost(req, res) {
+  try {
+    const postId = req.params.id;
+
+    const post = await Post.findByPk(postId);
+
+    if (!post) return res.status(404).json({ error: "Post não encontrado" });
+
+    const isOwner = post.userId === req.user.id;
+    const isAdmin = req.user.role === "admin";
+    const isArtist = req.user.artist === true;
+
+    if (!isOwner && !isAdmin && !isArtist) {
+      return res.status(403).json({ error: "Sem permissão para editar" });
+    }
+
+    const { text } = req.body;
+
+    if (text) post.text = text;
+    if (req.file) post.imageUrl = `/uploads/posts/${req.file.filename}`;
+
+    await post.save();
+
+    const updated = await Post.findByPk(post.id, {
+      include: { model: User, attributes: ["id", "userName", "name", "photo"] },
+    });
+
+    res.json(updated);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}
+
+

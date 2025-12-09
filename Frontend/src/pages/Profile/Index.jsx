@@ -6,8 +6,6 @@ import axios from "axios";
 
 import Header from "../../components/Header/Index";
 import Navbar from "../../components/Navbar/Index";
-import TabsComunidades from "../../components/Tabs/TabsComunidades/Index";
-import TabsMusicas from "../../components/Tabs/TabsMusicas/Index";
 
 export default function Profile() {
   const { id } = useParams();
@@ -18,7 +16,6 @@ export default function Profile() {
   const [isEditingBio, setIsEditingBio] = useState(false);
   const [tempBio, setTempBio] = useState("");
 
-  const [activeTab, setActiveTab] = useState("musicas");
   const [menuOpen, setMenuOpen] = useState(false);
 
   const menuRef = useRef(null);
@@ -126,34 +123,6 @@ export default function Profile() {
     logout();
     window.location.href = "/login";
   };
-
-  // ===============================
-  // RENDERIZAR TABS
-  // ===============================
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case "musicas":
-        return <TabsMusicas />;
-
-      case "comunidades":
-        return (
-          <div className="flex justify-center">
-            <div className="grid grid-cols-3 justify-around">
-              <TabsComunidades />
-              <TabsComunidades />
-              <TabsComunidades />
-              <TabsComunidades />
-              <TabsComunidades />
-              <TabsComunidades />
-            </div>
-          </div>
-        );
-
-      default:
-        return null;
-    }
-  };
-
   // ===========================================================
   // RENDER PRINCIPAL
   // ===========================================================
@@ -279,28 +248,9 @@ export default function Profile() {
             </div>
           </div>
 
-          {/* Tabs */}
           <div className="tab-navigation">
-            <button
-              className={`tab-button ${
-                activeTab === "musicas" ? "active" : ""
-              }`}
-              onClick={() => setActiveTab("musicas")}
-            >
-              Músicas
-            </button>
 
-            <button
-              className={`tab-button ${
-                activeTab === "comunidades" ? "active" : ""
-              }`}
-              onClick={() => setActiveTab("comunidades")}
-            >
-              Comunidades
-            </button>
           </div>
-
-          <div className="tab-content">{renderTabContent()}</div>
         </div>
       </div>
     </>

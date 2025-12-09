@@ -54,17 +54,6 @@ export default function Navbar() {
               </Link>
             </li>
 
-            {/* MENSAGENS */}
-            <li>
-              <Link
-                to="/Msg"
-                className="navbar-item flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-300 hover:translate-x-1 text-[#B15B3C] dark:text-white"
-              >
-                <ion-icon name="chatbubbles-sharp"></ion-icon>
-                <span className="hidden md:flex">Mensagens</span>
-              </Link>
-            </li>
-
             {/* CONFIGURAÇÕES */}
             <li>
               <Link
